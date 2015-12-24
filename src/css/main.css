@@ -1,0 +1,36 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    width: 98%;
+    background-color: black;
+    color: white;
+    text-align: center;
+    margin-top: 0;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    padding: 1%;
+    font-size: 2.5em;
+}
+
+main {
+    padding: 5%;
+}
+
+.notecard {
+    margin-right: auto;
+    margin-left: auto;
+    width: 75%;
+}
+
+.mathbox {
+    width: 100%;
+    height: 100%;
+    font-size: x-large;
+    padding: 15px;
+    margin-top: 2px;
+    border: 1px solid grey;
+}
