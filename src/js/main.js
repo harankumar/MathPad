@@ -1,15 +1,11 @@
-// TODO: Refactor out methods
-// TODO: Fix equality checking
-
 function focus(mathbox){
     var customKeyDownEvent = $.Event('keydown');
 
     customKeyDownEvent.bubbles = false;
     customKeyDownEvent.cancelable = false;
-    var key = 39;
-    customKeyDownEvent.charCode = key;
-    customKeyDownEvent.keyCode = key;
-    customKeyDownEvent.which = key;
+    customKeyDownEvent.charCode = 39;
+    customKeyDownEvent.keyCode = 39;
+    customKeyDownEvent.which = 39;
 
     mathbox.children().children('textarea').trigger(customKeyDownEvent).focus();
 }
@@ -20,6 +16,10 @@ function cursorAtBeginning(mathbox){
 
 function cursorAtEnd(mathbox){
     return mathbox.children(":last-child").hasClass("cursor");
+}
+
+function isEmpty(mathbox) {
+    return mathbox.mathquill('latex') === '';
 }
 
 $(document).ready(function(){
@@ -43,10 +43,10 @@ $(document).ready(function(){
             var prev = mathbox.prev();
             var next = mathbox.next();
             if (cursorAtBeginning(mathbox) && $(".mathbox").length > 1){
-                if (mathbox.mathquill('latex') == ''){
+                if (isEmpty(mathbox)) {
                     mathbox.remove();
                     focus(prev);
-                } else if (prev.length != 0){
+                } else if (prev.length !== 0) {
                     prev.remove();
                 }
             }
@@ -60,13 +60,13 @@ $(document).ready(function(){
             var prev = mathbox.prev();
             var next = mathbox.next();
             if (cursorAtEnd(mathbox) && $(".mathbox").length > 1){
-                if (mathbox.mathquill('latex') == ''){
+                if (isEmpty(mathbox)) {
                     mathbox.remove();
-                    if (next.length == 0)
+                    if (next.length === 0)
                         focus(prev);
                     else
                         focus(next);
-                } else if (next.length != 0){
+                } else if (next.length !== 0) {
                     next.remove();
                 }
             }
