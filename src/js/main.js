@@ -1,20 +1,25 @@
-function focus(mathbox){
+function keystroke(mathbox, keyCode) {
     var customKeyDownEvent = $.Event('keydown');
 
     customKeyDownEvent.bubbles = false;
     customKeyDownEvent.cancelable = false;
-    customKeyDownEvent.charCode = 39;
-    customKeyDownEvent.keyCode = 39;
-    customKeyDownEvent.which = 39;
+    customKeyDownEvent.charCode = keyCode;
+    customKeyDownEvent.keyCode = keyCode;
+    customKeyDownEvent.which = keyCode;
 
-    mathbox.children().children('textarea').trigger(customKeyDownEvent).focus();
+    mathbox.children().children('textarea').trigger(customKeyDownEvent);
 }
 
-function cursorAtBeginning(mathbox){
+function focus(mathbox){
+    keystroke(mathbox, 32);
+    mathbox.children().children('textarea').focus();
+}
+
+function isCursorAtBeginning(mathbox) {
     return mathbox.children(":nth-child(2)").hasClass("cursor");
 }
 
-function cursorAtEnd(mathbox){
+function isCursorAtEnd(mathbox) {
     return mathbox.children(":last-child").hasClass("cursor");
 }
 
@@ -22,11 +27,21 @@ function isEmpty(mathbox) {
     return mathbox.mathquill('latex') === '';
 }
 
+function moveCursorToBeginning(mathbox) {
+    keystroke(mathbox, 36);
+}
+
+function moveCursorToEnd(mathbox) {
+    keystroke(mathbox, 35);
+}
+
 $(document).ready(function(){
+    //TODO: Make this a switch statement?
     $('.notecard').keydown(function(e){
         var mathbox = $(e.target).parent().parent();
         if (e.key === "Enter"){
             /** Adds a new mathbox directly below and focuses it
+             * TODO: Fix this behavior pls
              * TODO: All text after the cursor goes into the next box
              */
             mathbox.after('<span class="mathquill-editable mathbox"></span>');
@@ -42,7 +57,7 @@ $(document).ready(function(){
              * */
             var prev = mathbox.prev();
             var next = mathbox.next();
-            if (cursorAtBeginning(mathbox) && $(".mathbox").length > 1){
+            if (isCursorAtBeginning(mathbox) && $(".mathbox").length > 1) {
                 if (isEmpty(mathbox)) {
                     mathbox.remove();
                     focus(prev);
@@ -59,7 +74,7 @@ $(document).ready(function(){
              * */
             var prev = mathbox.prev();
             var next = mathbox.next();
-            if (cursorAtEnd(mathbox) && $(".mathbox").length > 1){
+            if (isCursorAtEnd(mathbox) && $(".mathbox").length > 1) {
                 if (isEmpty(mathbox)) {
                     mathbox.remove();
                     if (next.length === 0)
@@ -70,8 +85,32 @@ $(document).ready(function(){
                     next.remove();
                 }
             }
+        } else if (e.key === "ArrowLeft" && isCursorAtBeginning(mathbox)) {
+            var prev = mathbox.prev();
+            if (prev.length !== 0) {
+                focus(prev);
+                moveCursorToEnd(prev);
+            }
+        } else if (e.key === "ArrowRight" && isCursorAtEnd(mathbox)) {
+            var next = mathbox.next();
+            if (next.length !== 0) {
+                focus(next);
+                moveCursorToBeginning(next);
+            }
+        } else if (e.key === "ArrowUp") {
+            var prev = mathbox.prev();
+            if (prev.length !== 0) {
+                focus(prev);
+                moveCursorToEnd(prev);
+            }
+        } else if (e.key === "ArrowDown") {
+            var next = mathbox.next();
+            if (next.length !== 0) {
+                focus(next);
+                moveCursorToBeginning(next);
+            }
         }
-        // TODO: UP DOWN LEFT RIGHT
+
         // TODO: Indentation?, shortcut for plain text
     });
 });
