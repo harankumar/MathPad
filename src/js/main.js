@@ -11,7 +11,6 @@ function keystroke(mathbox, keyCode) {
 }
 
 function focus(mathbox){
-    keystroke(mathbox, 32);
     mathbox.children().children('textarea').focus();
 }
 
@@ -36,18 +35,33 @@ function moveCursorToEnd(mathbox) {
 }
 
 $(document).ready(function(){
+    $('header').click(function () {
+        keystroke($('.mathbox'), 36);
+    });
     //TODO: Make this a switch statement?
     $('.notecard').keydown(function(e){
         var mathbox = $(e.target).parent().parent();
-        if (e.key === "Enter"){
+        if (e.key === "Enter") {
             /** Adds a new mathbox directly below and focuses it
-             * TODO: Fix this behavior pls
-             * TODO: All text after the cursor goes into the next box
-             */
-            mathbox.after('<span class="mathquill-editable mathbox"></span>');
-            var next = mathbox.next();
-            next.mathquill('editable');
-            focus(next);
+             *
+             * */
+            if (isCursorAtEnd(mathbox)) {
+                mathbox.after('<span class="mathquill-editable mathbox"></span>');
+                var next = mathbox.next();
+                next.mathquill('editable');
+                focus(next);
+            } else if (isCursorAtBeginning(mathbox)) {
+                mathbox.before('<span class="mathquill-editable mathbox"></span>');
+                var prev = mathbox.prev();
+                prev.mathquill('editable');
+                focus(prev);
+            } else {
+                // TODO: split up text between the two boxes
+                mathbox.after('<span class="mathquill-editable mathbox"></span>');
+                var next = mathbox.next();
+                next.mathquill('editable');
+                focus(next);
+            }
         } else if (e.key === "Backspace"){
             /** If at the beginning of mathbox and there are more than one:
                  * If current box is empty:
@@ -85,7 +99,8 @@ $(document).ready(function(){
                     next.remove();
                 }
             }
-        } else if (e.key === "ArrowLeft" && isCursorAtBeginning(mathbox)) {
+        } // TODO: Arrow Key Jump triggers too early
+        else if (e.key === "ArrowLeft" && isCursorAtBeginning(mathbox)) {
             var prev = mathbox.prev();
             if (prev.length !== 0) {
                 focus(prev);
