@@ -3,6 +3,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 }
 
 #container {
@@ -14,7 +15,6 @@ header, footer {
     background-color: black;
     color: white;
     text-align: center;
-    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     padding: 1%;
 }
 
@@ -42,12 +42,36 @@ main {
     border: 1px solid grey;
 }
 
+#help-button {
+    position: fixed;
+    bottom: 0;
+    right: 10px;
+    padding: 1%;
+    height: 15px;
+    width: 15px;
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 100%;
+    background-color: #333;
+    color: white;
+    z-index: 100;
+    -webkit-border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+}
+
+#help-button:hover {
+    box-shadow: 0 0 3px 2px #68b4df;
+}
+
 footer {
     margin-top: auto;
     font-size: 1.2rem;
 }
 
-footer span {
+footer a {
+    text-decoration: none;
     color: lightgrey;
     padding-right: 10%;
     padding-left: 10%;
