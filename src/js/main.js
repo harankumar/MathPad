@@ -20,46 +20,16 @@ function getID(mathbox) {
     return mathbox.attr('id');
 }
 
-var empty = {};
-
 function isEmpty(mathbox) {
-    var id = getID(mathbox);
-    var previous = empty[id];
-    var present = mathbox.mathquill('latex') === '';
-
-    if (previous && present) {
-        empty[id] = false;
-        return true;
-    } else if (present) {
-        empty[id] = true;
-        return false;
-    } else {
-        empty[id] = false;
-        return false;
-    }
+    return mathbox.mathquill('latex') === '';
 }
 
-var cursorAtBeginning = {};
-
 function isCursorAtBeginning(mathbox) {
-    var id = getID(mathbox);
-    var previous = cursorAtBeginning[id];
-    var present = mathbox.children(":nth-child(2)").hasClass("cursor");
-    if (previous && present) {
-        cursorAtBeginning[id] = false;
-        return true;
-    } else if (present) {
-        cursorAtBeginning[id] = true;
-        return false;
-    } else {
-        cursorAtBeginning[id] = false;
-        return false;
-    }
+    return mathbox.children(":nth-child(2)").hasClass("cursor");
 }
 
 function moveCursorToBeginning(mathbox) {
     keystroke(mathbox, 36);
-    cursorAtBeginning[getID(mathbox)] = true;
 }
 
 function isCursorAtEnd(mathbox) {
@@ -75,15 +45,7 @@ var prevText = {};
 function textNotChanged(mathbox) {
     var prev = prevText[getID(mathbox)];
     var curr = mathbox.mathquill('latex');
-    //console.log(prev + ' ' + curr);
     return prev === curr;
-}
-
-function update(mathbox) {
-    isCursorAtBeginning(mathbox);
-    isCursorAtEnd(mathbox);
-    isEmpty(mathbox);
-    updatePrevText(mathbox);
 }
 
 function updatePrevText(mathbox) {
@@ -92,7 +54,12 @@ function updatePrevText(mathbox) {
         if (text === undefined || text === null)
             text = '';
         prevText[getID(mathbox)] = text;
-    }, 30);
+    }, 10);
+}
+
+function update(mathbox) {
+    // Leaving this wrapper here since I might need to add more update functions
+    updatePrevText(mathbox);
 }
 
 $(document).ready(function () {
@@ -131,38 +98,26 @@ $(document).ready(function () {
                 update(next);
             }
         } else if (e.key === "Backspace") {
-            /** If at the beginning of mathbox and there are more than one:
-             * If current box is empty:
-             * Delete current box, focus box directly above
-             * If current box not empty and there is a box above it:
-             * Combine previous and current box into one, focus it
+            /** If at the beginning of mathbox, there are more than one, and the backspace wasn't also a text deleting one:
+             * Combine the mathbox with the previous one
              * */
             var prev = mathbox.prev();
             var next = mathbox.next();
-            if (mathbox.children(":nth-child(2)").hasClass("cursor") && textNotChanged(mathbox) && $(".mathbox").length > 1) {
+            if (isCursorAtBeginning(mathbox) && textNotChanged(mathbox) && $(".mathbox").length > 1) {
                 prev.mathquill('latex', prev.mathquill('latex') + ' ' + mathbox.mathquill('latex'));
                 mathbox.remove();
                 focus(prev);
             }
         } else if (e.key === "Delete") {
-            /** If at the end of mathbox and there are more than one:
-             * If current box is empty:
-             * Delete current box, focus box directly below (or above, if that's the only one left)
-             * If current box not empty and there is a box below it:
-             * Delete next box, maintain focus on current TODO: have a more traditional behavior here
+            /** If at the end of mathbox, there are more than one, and the delete wasn't also a text deleting one:
+             * Combine the mathbox with the next one
              * */
             var prev = mathbox.prev();
             var next = mathbox.next();
-            if (isCursorAtEnd(mathbox) && $(".mathbox").length > 1) {
-                if (isEmpty(mathbox)) {
-                    mathbox.remove();
-                    if (next.length === 0)
-                        focus(prev);
-                    else
-                        focus(next);
-                } else if (next.length !== 0) {
-                    next.remove();
-                }
+            if (isCursorAtEnd(mathbox) && textNotChanged(mathbox) && $(".mathbox").length > 1) {
+                next.mathquill('latex', mathbox.mathquill('latex') + ' ' + next.mathquill('latex'));
+                mathbox.remove();
+                focus(next);
             }
         }
         else if (e.key === "ArrowLeft") {
@@ -192,10 +147,8 @@ $(document).ready(function () {
                 focus(next);
                 moveCursorToBeginning(next);
             }
-        } else {
-            update(mathbox);
         }
-        updatePrevText(mathbox);
+        update(mathbox);
         // TODO: Indentation?, shortcut for plain text
     }).click(function (e) {
         var mathbox = $(e.target).parent().parent();
