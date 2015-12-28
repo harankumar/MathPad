@@ -1,4 +1,5 @@
-var id_no = 1;
+var mathboxIdNumber = 1;
+var isHelpDisplayed = false;
 
 function keystroke(mathbox, keyCode) {
     var customKeyDownEvent = $.Event('keydown');
@@ -62,30 +63,50 @@ function update(mathbox) {
     updatePrevText(mathbox);
 }
 
+function displayHelpMenu(){
+    $('#help').removeClass('hidden');
+    $('#container, footer').addClass('hidden');
+    isHelpDisplayed = true;
+}
+
+function hideHelpMenu(){
+    $('#help').addClass('hidden');
+    $('#container, footer').removeClass('hidden');
+    isHelpDisplayed = false;
+}
+
+function toggleHelpMenu(){
+    if (isHelpDisplayed)
+        hideHelpMenu();
+    else
+        displayHelpMenu();
+}
+
 $(document).ready(function () {
-    //TODO: Make this a switch statement?
+    $('#help-button').click(displayHelpMenu);
+    $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
+    $('#help-modal-close').click(hideHelpMenu);
     $('.notecard').keydown(function (e) {
         var mathbox = $(e.target).parent().parent();
         if (e.key === "Enter") {
             //TODO: This needs hella refactoring
             /** Adds a new mathbox directly below and focuses it
-             *
              * */
             if (isCursorAtEnd(mathbox)) {
                 mathbox.after('<span class="mathquill-editable mathbox"></span>');
                 var next = mathbox.next();
                 next.mathquill('editable');
                 focus(next);
-                id_no++;
-                next.attr('id', id_no);
+                mathboxIdNumber++;
+                next.attr('id', mathboxIdNumber);
                 update(next);
             } else if (isCursorAtBeginning(mathbox)) {
                 mathbox.before('<span class="mathquill-editable mathbox"></span>');
                 var prev = mathbox.prev();
                 prev.mathquill('editable');
                 focus(prev);
-                id_no++;
-                prev.attr('id', id_no);
+                mathboxIdNumber++;
+                prev.attr('id', mathboxIdNumber);
                 update(prev);
             } else {
                 // TODO: split up text between the two boxes
@@ -93,8 +114,8 @@ $(document).ready(function () {
                 var next = mathbox.next();
                 next.mathquill('editable');
                 focus(next);
-                id_no++;
-                next.attr('id', id_no);
+                mathboxIdNumber++;
+                next.attr('id', mathboxIdNumber);
                 update(next);
             }
         } else if (e.key === "Backspace") {
@@ -120,6 +141,8 @@ $(document).ready(function () {
                 focus(next);
             }
         }
+        //TODO: Arrow Keys Trigger TOO EARLY (i.e. skips a character)
+        //TODO: Add Documentation
         else if (e.key === "ArrowLeft") {
             if (isCursorAtBeginning(mathbox)) {
                 var prev = mathbox.prev();
