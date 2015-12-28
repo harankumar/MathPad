@@ -54,6 +54,11 @@ function moveCursorToEnd(mathbox) {
     keystroke(mathbox, 35);
 }
 
+function isCursorElevated(mathbox) {
+    // Checks if cursor is in super or subscript
+    return mathbox.find('sub.hasCursor, sup.hasCursor').length > 0;
+}
+
 var prevCursorAtBeginning = {}; // TODO: Seriously? Get A Better name than this
 
 function updatePrevCursorAtBeginning(mathbox) {
@@ -82,6 +87,20 @@ function cursorAtEndNotChanged(mathbox) {
     return prev === curr;
 }
 
+var prevCursorElevation = {};
+
+function updatePrevCursorElevation(mathbox) {
+    setTimeout(function (){
+        prevCursorElevation[getID(mathbox)] = isCursorElevated(mathbox);
+    }, 10);
+}
+
+function cursorElevationNotChanged(mathbox) {
+    var prev = prevCursorElevation[getID(mathbox)];
+    var curr = isCursorElevated(mathbox);
+    return prev === curr;
+}
+
 /* Text Change Stuff */
 
 var prevText = {};
@@ -105,6 +124,7 @@ function update(mathbox) {
     updatePrevCursorAtBeginning(mathbox);
     updatePrevCursorAtEnd(mathbox);
     updatePrevText(mathbox);
+    updatePrevCursorElevation(mathbox);
 }
 
 // Keyboard Stuff
@@ -185,27 +205,27 @@ function onArrowRight(mathbox) {
      * Move to mathbox directly below
      * */
     var next = mathbox.next();
-    if (isCursorAtEnd(mathbox) && cursorAtEndNotChanged(mathbox) && next.length !== 0){
+    if (isCursorAtEnd(mathbox) && cursorAtEndNotChanged(mathbox) && next.length !== 0) {
         focus(next);
         moveCursorToBeginning(next);
     }
 }
 
-//TODO: This behavior may be annoying when working with sub/superscripts... check if keystroke caused the cursor to move
-
 function onArrowUp(mathbox) {
-    /** If there is a box above, move to it */
+    /** If there is a box above, and the keystroke didn't cause an elevation change:
+     *  move to it */
     var prev = mathbox.prev();
-    if (prev.length !== 0) {
+    if (prev.length !== 0 && cursorElevationNotChanged(mathbox)) {
         focus(prev);
         moveCursorToEnd(prev);
     }
 }
 
 function onArrowDown(mathbox) {
-    /** If there is a box below, move to it */
+    /** If there is a box below, and the keystroke didn't cause an elevation change:
+     * move to it */
     var next = mathbox.next();
-    if (next.length !== 0) {
+    if (next.length !== 0 && cursorElevationNotChanged(mathbox)) {
         focus(next);
         moveCursorToBeginning(next);
     }
@@ -223,8 +243,7 @@ function onKeyDown(e) {
         onBackspace(mathbox);
     } else if (e.key === "Delete") {
         onDelete(mathbox);
-    }
-    else if (e.key === "ArrowLeft") {
+    } else if (e.key === "ArrowLeft") {
         onArrowLeft(mathbox);
     } else if (e.key === "ArrowRight") {
         onArrowRight(mathbox);
