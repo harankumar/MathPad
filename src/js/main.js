@@ -237,19 +237,19 @@ function onArrowDown(mathbox) {
 
 function onKeyDown(e) {
     var mathbox = $(e.target).parent().parent();
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.keyCode === 13) {
         onEnter(mathbox);
-    } else if (e.key === "Backspace") {
+    } else if (e.key === "Backspace" || e.keyCode === 8) {
         onBackspace(mathbox);
-    } else if (e.key === "Delete") {
+    } else if (e.key === "Delete" || e.keyCode === 46) {
         onDelete(mathbox);
-    } else if (e.key === "ArrowLeft") {
+    } else if (e.key === "ArrowLeft" || e.keyCode === 37) {
         onArrowLeft(mathbox);
-    } else if (e.key === "ArrowRight") {
+    } else if (e.key === "ArrowRight" || e.keyCode === 39) {
         onArrowRight(mathbox);
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === "ArrowUp" || e.keyCode === 38) {
         onArrowUp(mathbox);
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === "ArrowDown" || e.keyCode === 40) {
         onArrowDown(mathbox);
     }
     update(mathbox);
