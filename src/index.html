@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <title>The Math Pad</title>
     <link rel="stylesheet" type="text/css" href="css/mathquill.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -25,14 +26,31 @@
         <!--TODO: Mouse based controls-->
     </main>
 
-    <a id="help-button" href="#help">
-        ?
-    </a>
+    <div id="button-container">
+        <div id="button-container-wrapper">
+            <a href="#save" id="save-button" class="button">
+                <i class="fa fa-floppy-o"></i>
+            </a>
 
+            <a href="#settings" id="settings-button" class="button">
+                <i class="fa fa-cog"></i>
+            </a>
+
+            <a id="help-button" href="#help" class="button">
+                <i class="fa fa-info-circle"></i>
+            </a>
+        </div>
+    </div>
     <!--TODO: Some sort of compatibility Dialog -->
     <!--TODO: Add Settings -->
     <!--TODO: File Saving -->
     <!--TODO: File Export - to SVG via mathjax? -->
+
+</div>
+
+<div id="settings" class="hidden"></div>
+
+<div id="save" class="hidden">
 
 </div>
 
@@ -54,7 +72,8 @@
                 <span class="code">_</span> for subscripts. Many LaTeX commands and symbols are also supported, such as
                 <span class="code">\sqrt</span> for square roots, <span class="code">\binom</span> for combinatorics,
                 <span class="code">\sum</span> for summation, Greek letters such as <span class="code">\gamma</span> and
-                <span class="code">\Gamma</span> (capitalization <i>does</i> matter here) and many more. For a more thorough
+                <span class="code">\Gamma</span> (capitalization <i>does</i> matter here) and many more. For a more
+                thorough
                 reference, check out Art of Problem Solving's excellent documentation on LaTeX <a
                     href="http://www.artofproblemsolving.com/wiki/index.php?titleLaTeX:Commands">commands</a> and <a
                     href="http://www.artofproblemsolving.com/wiki/index.php?titleLaTeX:Symbols">symbols</a>.
