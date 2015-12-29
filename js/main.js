@@ -341,13 +341,24 @@ function initSaveMenu() {
     var textOutput = $('#text-output');
     textOutput.html('');
     for (var i = 0; i < lines.length; i++) {
-        console.log(lines[i]);
         textOutput.append('<div class="mathquill-embedded-latex"></div>');
         textOutput.find('div:last').text(lines[i]).mathquill();
         textOutput.append('<br>');
     }
 
     $('#latex-source').val(getDocument());
+
+    h2cLoaded.done(function(){
+        var selectable = $('.selectable');
+        selectable.addClass('hidden');
+        $('#image-output').html('');
+        html2canvas($('#text-output'), {
+            onrendered: function(canvas) {
+                $('#image-output').html(canvas);
+                selectable.addClass('hidden')
+            }
+        });
+    });
 }
 
 function displaySaveMenu() {
@@ -379,12 +390,12 @@ function toggleHelpMenu() {
         displayHelpMenu();
 }
 
-/******************************
- * BIG WRAPPER FOR EVERYTHING
- ******************************/
+/************************************
+ * BIG WRAPPER/LOADER FOR EVERYTHING
+ ************************************/
 
 // SAVING
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function(){
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function () {
     loadData();
     setInterval(save, 5000);
 });
@@ -393,11 +404,18 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js
 $.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard.min.js", initClipboard);
 
 // KEY COMBINATIONS
-$.getScript("js/hotkeys.min.js", function(){
+$.getScript("js/hotkeys.min.js", function () {
     $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
     $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
 });
 
+// HTML TO CANVAS
+var h2cLoaded = $.Deferred();
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js", function(){
+    h2cLoaded.resolve();
+});
+
+// DOM
 $(document).ready(function () {
     // NAVIGATION
     var notecard = $('.notecard');
