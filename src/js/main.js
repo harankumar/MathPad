@@ -288,7 +288,7 @@ function getLines() {
 function getDocument() {
     return getLines().join('\n');
 }
-
+//TODO: randomly breaks
 function loadData() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
@@ -332,7 +332,15 @@ function displaySaveMenu() {
     $('#save').removeClass('hidden');
     isSaveDisplayed = true;
 
+    var lines = getLines();
     $('#latex-source').val(getDocument());
+    var textOutput = $('#text-output');
+    for (var i = 0; i < lines.length; i++) {
+        console.log(lines[i]);
+        textOutput.append('<div class="mathquill-embedded-latex"></div>');
+        textOutput.find('div:last').text(lines[i]).mathquill();
+        textOutput.append('<br>');
+    }
 }
 
 function toggleSaveMenu() {

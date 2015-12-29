@@ -130,6 +130,11 @@ main {
     padding: 1%;
 }
 
+#text-output {
+    padding: 1%;
+    font-size: 1.2rem;
+}
+
 #latex-source {
     width: 70%;
     font-size: 1.2rem;
