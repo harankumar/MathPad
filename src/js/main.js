@@ -98,7 +98,7 @@ function cursorAtEndNotChanged(mathbox) {
 var prevCursorElevation = {};
 
 function updatePrevCursorElevation(mathbox) {
-    setTimeout(function (){
+    setTimeout(function () {
         prevCursorElevation[getID(mathbox)] = isCursorElevated(mathbox);
     }, 10);
 }
@@ -270,37 +270,12 @@ function onClick(e) {
 }
 
 /******************************
- * HELP MENU
- ******************************/
-
-var isHelpDisplayed = false;
-
-function displayHelpMenu() {
-    $('#help').removeClass('hidden');
-    $('#container, footer').addClass('hidden');
-    isHelpDisplayed = true;
-}
-
-function hideHelpMenu() {
-    $('#help').addClass('hidden');
-    $('#container, footer').removeClass('hidden');
-    isHelpDisplayed = false;
-}
-
-function toggleHelpMenu() {
-    if (isHelpDisplayed)
-        hideHelpMenu();
-    else
-        displayHelpMenu();
-}
-
-/******************************
  * SAVE
  ******************************/
 
-function getLines(){
+function getLines() {
     var lines = [];
-    $('.mathbox').each(function(){
+    $('.mathbox').each(function () {
         var text = $(this).mathquill('latex');
         if (text === '' || text === undefined || text === null) {
         } else {
@@ -310,7 +285,7 @@ function getLines(){
     return lines;
 }
 
-function loadData(){
+function loadData() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
     if (lines.length > 0) {
@@ -325,8 +300,54 @@ function loadData(){
     focus(mathbox);
 }
 
-function save(){
+function save() {
     store.set('lines', getLines());
+}
+
+/******************************
+ * MENUS
+ ******************************/
+
+var isSaveDisplayed = false;
+var isHelpDisplayed = false;
+
+function hideEverything() {
+    $('#container, footer, #save, #help').addClass('hidden');
+    isSaveDisplayed = false;
+    isHelpDisplayed = false;
+}
+
+function showMathPad() {
+    hideEverything();
+    $('#container, footer').removeClass('hidden');
+}
+
+// Save Menu
+function displaySaveMenu() {
+    hideEverything();
+    $('#save').removeClass('hidden');
+    isSaveDisplayed = true;
+}
+
+function toggleSaveMenu() {
+    if (isSaveDisplayed)
+        showMathPad();
+    else
+        displaySaveMenu();
+}
+
+// Help Menu
+function displayHelpMenu() {
+    hideEverything();
+    $('#help').removeClass('hidden');
+    isHelpDisplayed = true;
+}
+
+function toggleHelpMenu() {
+    if (isHelpDisplayed)
+        showMathPad();
+    else
+        displayHelpMenu();
 }
 
 /******************************
@@ -338,10 +359,13 @@ $(document).ready(function () {
     var notecard = $('.notecard');
     notecard.keydown(onKeyDown);
     notecard.click(onClick);
-    // HELP MENU
+    // MENUS
+    $('#save-button').click(displaySaveMenu);
+    $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
+    $('#save-close').click(showMathPad);
     $('#help-button').click(displayHelpMenu);
     $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
-    $('#help .overlay-close').click(hideHelpMenu);
+    $('#help-close').click(showMathPad);
     // SAVE
     loadData();
 });
