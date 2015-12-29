@@ -23,7 +23,11 @@ function keystroke(mathbox, keyCode) {
 // Focus
 
 function focus(mathbox) {
-    mathbox.children().children('textarea').focus();
+    mathbox.find('textarea').focus();
+}
+
+function unfocus(mathbox) {
+    mathbox.find('textarea').blur();
 }
 
 // ID
@@ -290,7 +294,49 @@ function toggleHelpMenu() {
 }
 
 /******************************
- * Listener Setup
+ * SAVE
+ ******************************/
+
+function getLines(){
+    var lines = [];
+    $('.mathbox').each(function(){
+        var text = $(this).mathquill('latex');
+        if (text === '' || text === undefined || text === null) {
+        } else {
+            lines.push(text);
+        }
+    });
+    return lines;
+}
+
+function loadData(){
+    var lines = store.get('lines');
+    var mathbox = $('.mathbox:last');
+    if (lines.length > 0) {
+        mathbox.mathquill('latex', lines[0]);
+        for (var i = 1; i < lines.length; i++) {
+            keystroke(mathbox, 13);
+            mathbox = mathbox.next();
+            mathbox.mathquill('latex', lines[i]);
+        }
+    }
+    unfocus($('.mathbox'));
+    focus(mathbox);
+}
+
+function save(){
+    store.set('lines', getLines());
+}
+
+function initAutoSave(){
+    loadData();
+    setTimeout(function(){
+        setInterval(save, 5000);
+    }, 1000);
+}
+
+/******************************
+ * BIG WRAPPER FOR EVERYTHING
  ******************************/
 
 $(document).ready(function () {
@@ -302,4 +348,6 @@ $(document).ready(function () {
     $('#help-button').click(displayHelpMenu);
     $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
     $('#help-modal-close').click(hideHelpMenu);
+    // SAVE
+    initAutoSave();
 });
