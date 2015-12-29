@@ -341,7 +341,7 @@ $(document).ready(function () {
     // HELP MENU
     $('#help-button').click(displayHelpMenu);
     $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
-    $('#help-modal-close').click(hideHelpMenu);
+    $('#help .overlay-close').click(hideHelpMenu);
     // SAVE
     loadData();
 });
