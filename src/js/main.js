@@ -133,6 +133,7 @@ function update(mathbox) {
     updatePrevCursorAtEnd(mathbox);
     updatePrevText(mathbox);
     updatePrevCursorElevation(mathbox);
+    save();
 }
 
 // Keyboard Stuff
@@ -328,13 +329,6 @@ function save(){
     store.set('lines', getLines());
 }
 
-function initAutoSave(){
-    loadData();
-    setTimeout(function(){
-        setInterval(save, 5000);
-    }, 1000);
-}
-
 /******************************
  * BIG WRAPPER FOR EVERYTHING
  ******************************/
@@ -349,5 +343,5 @@ $(document).ready(function () {
     $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
     $('#help-modal-close').click(hideHelpMenu);
     // SAVE
-    initAutoSave();
+    loadData();
 });
