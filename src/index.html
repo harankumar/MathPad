@@ -15,9 +15,26 @@
 
 <div id="container">
     <header>
-        The Math Pad
-    </header>
+        <span id="title">
+            The Math Pad
+        </span>
+        <span id="toolbar">
+            <div id="button-container">
+                <a href="#save" id="save-button" class="button">
+                    <i class="fa fa-lg fa-floppy-o"></i>
+                </a>
 
+                <a href="#settings" id="settings-button" class="button">
+                    <i class="fa fa-lg fa-cog"></i>
+                </a>
+
+                <a id="help-button" href="#help" class="button">
+                    <i class="fa fa-lg fa-info-circle"></i>
+                </a>
+            </div>
+        </span>
+
+    </header>
     <main>
         <div class="notecard" title="Enter some amazing math here!">
             <span class="mathquill-editable mathbox" id="0"></span>
@@ -25,22 +42,6 @@
         <!--TODO: Allow for multiple notecards?-->
         <!--TODO: Mouse based controls-->
     </main>
-
-    <div id="button-container">
-        <div id="button-container-wrapper">
-            <a href="#save" id="save-button" class="button">
-                <i class="fa fa-floppy-o"></i>
-            </a>
-
-            <a href="#settings" id="settings-button" class="button">
-                <i class="fa fa-cog"></i>
-            </a>
-
-            <a id="help-button" href="#help" class="button">
-                <i class="fa fa-info-circle"></i>
-            </a>
-        </div>
-    </div>
     <!--TODO: Some sort of compatibility Dialog -->
     <!--TODO: Add Settings -->
     <!--TODO: File Saving -->
