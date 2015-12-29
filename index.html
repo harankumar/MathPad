@@ -72,6 +72,7 @@
         <p>
             Below is your document, in formatted text form:
         </p>
+        <!--TODO: use mathjax instead -->
         <div id="text-output"></div>
         <h3>
             Download LaTeX source
@@ -80,6 +81,9 @@
             Below is your document's LaTeX source:
         </p>
         <textarea id="latex-source" readonly></textarea>
+        <div>
+            <button id="copy-text" data-clipboard-target="#latex-source">Copy to Clipboard</button>
+        </div>
         <h3>
             Download as Image(s)
         </h3>

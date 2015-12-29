@@ -270,6 +270,14 @@ function onClick(e) {
 }
 
 /******************************
+ * CLIPBOARD
+ ******************************/
+
+function initClipboard() {
+    new Clipboard('button');
+}
+
+/******************************
  * SAVE
  ******************************/
 
@@ -327,20 +335,27 @@ function showMathPad() {
 }
 
 // Save Menu
-function displaySaveMenu() {
-    hideEverything();
-    $('#save').removeClass('hidden');
-    isSaveDisplayed = true;
-
+function initSaveMenu() {
     var lines = getLines();
-    $('#latex-source').val(getDocument());
+
     var textOutput = $('#text-output');
+    textOutput.html('');
     for (var i = 0; i < lines.length; i++) {
         console.log(lines[i]);
         textOutput.append('<div class="mathquill-embedded-latex"></div>');
         textOutput.find('div:last').text(lines[i]).mathquill();
         textOutput.append('<br>');
     }
+
+    $('#latex-source').val(getDocument());
+}
+
+function displaySaveMenu() {
+    hideEverything();
+    $('#save').removeClass('hidden');
+    isSaveDisplayed = true;
+
+    initSaveMenu();
 }
 
 function toggleSaveMenu() {
@@ -373,6 +388,8 @@ $(document).ready(function () {
     var notecard = $('.notecard');
     notecard.keydown(onKeyDown);
     notecard.click(onClick);
+    // CLIPBOARD
+    initClipboard();
     // MENUS
     $('#save-button').click(displaySaveMenu);
     $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
@@ -382,4 +399,5 @@ $(document).ready(function () {
     $('#help-close').click(showMathPad);
     // SAVE
     loadData();
+    setInterval(save, 5000);
 });
