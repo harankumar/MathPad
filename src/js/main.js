@@ -285,6 +285,10 @@ function getLines() {
     return lines;
 }
 
+function getDocument() {
+    return getLines().join('\n');
+}
+
 function loadData() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
@@ -327,6 +331,8 @@ function displaySaveMenu() {
     hideEverything();
     $('#save').removeClass('hidden');
     isSaveDisplayed = true;
+
+    $('#latex-source').val(getDocument());
 }
 
 function toggleSaveMenu() {

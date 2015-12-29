@@ -130,6 +130,12 @@ main {
     padding: 1%;
 }
 
+#latex-source {
+    width: 70%;
+    font-size: 1.2rem;
+    font-family: Courier, Consolas, monospace;
+}
+
 footer {
     width: 98%;
     text-align: center;
