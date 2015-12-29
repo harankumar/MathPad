@@ -383,21 +383,29 @@ function toggleHelpMenu() {
  * BIG WRAPPER FOR EVERYTHING
  ******************************/
 
+// SAVING
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function(){
+    loadData();
+    setInterval(save, 5000);
+});
+
+// CLIPBOARD
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard.min.js", initClipboard);
+
+// KEY COMBINATIONS
+$.getScript("js/hotkeys.min.js", function(){
+    $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
+    $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
+});
+
 $(document).ready(function () {
     // NAVIGATION
     var notecard = $('.notecard');
     notecard.keydown(onKeyDown);
     notecard.click(onClick);
-    // CLIPBOARD
-    initClipboard();
     // MENUS
     $('#save-button').click(displaySaveMenu);
-    $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
     $('#save-close').click(showMathPad);
     $('#help-button').click(displayHelpMenu);
-    $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
     $('#help-close').click(showMathPad);
-    // SAVE
-    loadData();
-    setInterval(save, 5000);
 });
