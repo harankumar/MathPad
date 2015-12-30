@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+var mathboxText = '<span class="mathquill-editable mathbox"></span>';
+
 /******************************
  * NAVIGATION
  ******************************/
@@ -259,11 +261,11 @@ function onEnter(mathbox) {
     if (isCursorCommandInput(mathbox) || cursorCIChanged(mathbox))
         return;
     if (isCursorAtEnd(mathbox)) {
-        mathbox.after('<span class="mathquill-editable mathbox"></span>');
+        mathbox.after(mathboxText);
         var next = mathbox.next();
         add(next);
     } else if (isCursorAtBeginning(mathbox)) {
-        mathbox.before('<span class="mathquill-editable mathbox"></span>');
+        mathbox.before(mathboxText);
         var prev = mathbox.prev();
         add(prev);
     } else {
@@ -289,6 +291,7 @@ function onEnter(mathbox) {
 
 }
 
+//TODO: not just moving cursor to the end or beginning of line
 function onBackspace(mathbox) {
     /** If at the beginning of mathbox, there are more than one, and the backspace wasn't also a text deleting one:
      * Combine the mathbox with the previous one
@@ -414,25 +417,33 @@ function getLines() {
 function getDocument() {
     return getLines().join('\n');
 }
-//TODO: randomly breaks
+
 function loadData() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
     if (lines !== undefined && lines !== null && lines.length > 0) {
         mathbox.mathquill('latex', lines[0]);
-        for (var i = 1; i < lines.length; i++) {
-            keystroke(mathbox, 13);
-            mathbox = mathbox.next();
-            mathbox.mathquill('latex', lines[i]);
+        if (lines.length > 1) {
+            for (var i = 1; i < lines.length; i++) {
+                mathbox.after(mathboxText);
+                mathbox = mathbox.next();
+                add(mathbox);
+                mathbox.mathquill('latex', lines[i]);
+            }
         }
     }
     unfocus($('.mathbox'));
     focus(mathbox);
-    saveData.resolve();
+    saveDataLoaded.resolve();
 }
 
 function save() {
-    store.set('lines', getLines());
+    saveDataLoaded.done(function () {
+        store.set('lines', getLines());
+        setTimeout(function () {
+            store.set('lines', getLines());
+        }, 10);
+    });
 }
 
 /******************************
@@ -545,7 +556,7 @@ function route() {
  ************************************/
 
 // SAVING
-var saveData = $.Deferred();
+var saveDataLoaded = $.Deferred();
 $.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function () {
     loadData();
     setInterval(save, 5000);
@@ -585,7 +596,7 @@ $.when(fsLoaded, c2bLoaded).done(function () {
 
 // ROUTER
 route();
-$.when(saveData, fsReady).done(function () {
+$.when(saveDataLoaded, fsReady).done(function () {
     route();
 });
 
