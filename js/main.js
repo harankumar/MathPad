@@ -152,11 +152,10 @@ function getLatex(html) {
             return;
 
         var tag = this.tagName.toLowerCase();
+        var contents = getLatex($(this).children());
         if (tag === 'sup') {
-            var contents = getLatex($(this).children());
             latex += " ^{" + contents + "} ";
         } else if (tag === 'sub') {
-            var contents = getLatex($(this).children());
             latex += " _{" + contents + "} ";
         } else if (tag === 'var') {
             latex += this.innerHTML;
@@ -167,18 +166,63 @@ function getLatex(html) {
             if (classes.length === 0) {
                 latex += this.innerHTML;
             } else if (classes.contains('textarea')) {
+            } else if (classes.contains('text')){
+                latex += ' \\text{' + contents + '} ';
             } else if (classes.contains('fraction')) {
-                var numerator = getLatex($(this).find('.numerator').children());
-                var denominator = getLatex($(this).find('.denominator').children());
+                var numerator = getLatex($(this).children('.numerator').children());
+                var denominator = getLatex($(this).children('.denominator').children());
                 latex += ' \\frac{' + numerator + '}{' + denominator + '} ';
             } else if (classes.contains('binary-operator')) {
                 latex += this.innerHTML;
-            } else if ($(this).find('.sqrt-stem').length > 0){
-                var contents = getLatex($(this).find('.sqrt-stem').children());
+            } else if ($(this).children('.sqrt-stem').length > 0) {
+                contents = getLatex($(this).children('.sqrt-stem').children());
                 latex += ' \\sqrt{' + contents + '} ';
+            } else if (classes.contains('non-italicized-function')) {
+                latex += ' \\' + this.innerHTML + ' ';
+            } else if (classes.contains('paren')) {
+                var next = $(this).next();
+                var arr = next.children('.array');
+                if (arr.length > 0) {
+                    // left paren for a binom
+                    var top = getLatex(arr.children(':first').children());
+                    var bottom = getLatex(arr.children(':last').children());
+                    latex += ' \\binom{' + top + '}{' + bottom + '} ';
+                } else if ($(this).prev().children('.array').length > 0) {
+                    // right paren for a binom, skip it
+                } else {
+                    // regular paren
+                    switch (this.innerHTML) {
+                        case '{':
+                            latex += ' \\left \\';
+                            break;
+                        case '(':
+                        case '[':
+                            latex += ' \\left';
+                            break;
+                        case '}':
+                            latex += ' \\right \\';
+                            break;
+                        case ')':
+                        case ']':
+                            latex += ' \\right';
+                            break;
+                    }
+                    latex += this.innerHTML + ' ';
+                }
+            } else if (classes.contains('array') || $(this).children('.array').length > 0) {
+                // handled with the paren
+            } else if (classes.contains('underline')) {
+                latex += ' \\underline{' + contents + '} ';
+            } else if (classes.contains('overline')) {
+                latex += ' \\overline{' + contents + '} ';
+            } else if ($(this).children('.vector-stem').length > 0) {
+                contents = getLatex($(this).children('.vector-stem').children());
+                latex += ' \\vec{' + contents + '} ';
+            } else if (classes.contains('non-leaf')) {
+                latex += getLatex($(this).children());
             } else {
-                alert('holy crap wtf\n' + this.outerHTML);
-                // TODO: find and account for all the edge cases and other scenarios
+                console.error('holy crap wtf\n' + this.outerHTML);
+                latex += getLatex($(this.innerHTML));
             }
         }
     });
@@ -206,10 +250,8 @@ function onEnter(mathbox) {
         var cursor = $('.cursor');
         var prevHtml = $(cursor.prevAll().not('.textarea').get().reverse());
         var prevLatex = getLatex(prevHtml);
-        console.log(prevLatex);
         var nextHtml = cursor.nextAll().not('.textarea');
         var nextLatex = getLatex(nextHtml);
-        console.log(nextLatex);
         // add new box
         mathbox.after('<span class="mathquill-editable mathbox"></span>');
         var next = mathbox.next();
