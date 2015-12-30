@@ -447,14 +447,24 @@ function save() {
 }
 
 /******************************
+ * SETTINGS
+ ******************************/
+// Theming
+function setRootFontSize(value) {
+    $('html').css('font-size', value + 'px');
+    save();
+}
+
+/******************************
  * MENUS
  ******************************/
 
 var isSaveDisplayed = false;
 var isHelpDisplayed = false;
+var isSettingsDisplayed = false;
 
 function hideEverything() {
-    $('#container, footer, #save, #help').addClass('hidden');
+    $('#container, footer, #save, #help, #settings').addClass('hidden');
     isSaveDisplayed = false;
     isHelpDisplayed = false;
 }
@@ -534,6 +544,28 @@ function toggleHelpMenu() {
         displayHelpMenu();
 }
 
+// Settings Menu
+function initSettingsMenu() {
+    $('#font-size-select').change(function(){
+        setRootFontSize(this.value);
+    });
+}
+
+function displaySettingsMenu() {
+    hideEverything();
+    $('#settings').removeClass('hidden');
+    isSettingsDisplayed = true;
+
+    initSettingsMenu();
+}
+
+function toggleSettingsMenu() {
+    if (isSettingsDisplayed)
+        showMathPad();
+    else
+        displaySettingsMenu();
+}
+
 // Router
 
 function route() {
@@ -568,6 +600,7 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard
 // KEY COMBINATIONS
 $.getScript("js/hotkeys.min.js", function () {
     $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
+    $(document).bind('keydown', 'alt+ctrl+j', toggleSettingsMenu);
     $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
 });
 
@@ -611,4 +644,6 @@ $(document).ready(function () {
     $('#save-close').click(showMathPad);
     $('#help-button').click(displayHelpMenu);
     $('#help-close').click(showMathPad);
+    $('#settings-button').click(displaySettingsMenu);
+    $('#settings-close').click(showMathPad);
 });

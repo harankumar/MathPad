@@ -43,8 +43,6 @@
         <!--TODO: Mouse based controls to close, add, plaintext, rearrange, etc. -->
     </main>
     <!--TODO: Some sort of compatibility Dialog -->
-    <!--TODO: Add Settings -->
-
 </div>
 
 
@@ -93,7 +91,31 @@
     </div>
 </div>
 
-<div id="settings" class="hidden"></div>
+<div id="settings" class="hidden">
+    <div class="overlay-header clearfix">
+        <a href="#" class="overlay-close button" id="settings-close">
+            <i class="fa fa-lg fa-angle-left"></i>
+            <span>Back</span>
+        </a>
+        <span class="overlay-title">Settings</span>
+    </div>
+    <div class="overlay-body">
+        <h3>Font Size</h3>
+        <p>Customize the root font size of the editor. Note that the size of each component relative to the others will
+            remain the same, but each will be smaller or larger.</p>
+        <select id="font-size-select" title="Choose a Font Size">
+            <option value="6">6px</option>
+            <option value="8">8px</option>
+            <option value="10">10px</option>
+            <option value="11">11px</option>
+            <option value="12">12px</option>
+            <option value="14">14px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="24">24px</option>
+        </select>
+    </div>
+</div>
 
 <div id="help" class="hidden">
     <div class="overlay-header clearfix">
@@ -144,6 +166,10 @@
             <tr>
                 <td class="codebox"><span class="code">Control + Alt + S</span></td>
                 <td>Toggle save dialog</td>
+            </tr>
+            <tr>
+                <td class="codebox"><span class="code">Control + Alt + J</span></td>
+                <td>Toggle settings dialog</td>
             </tr>
             <tr>
                 <td class="codebox"><span class="code">Control + Alt + H</span></td>
