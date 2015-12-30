@@ -488,9 +488,7 @@ function initSaveMenu() {
         downloadBtn.off();
         downloadBtn.click(function () {
             canvas.toBlob(function (blob) {
-                console.info(blob);
                 saveAs(blob, "math_document.png");
-                // TODO: saved docs are too wide
             });
         });
     });

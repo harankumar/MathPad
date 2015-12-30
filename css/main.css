@@ -133,6 +133,8 @@ main {
 #text-output {
     padding: 1%;
     font-size: 1.2rem;
+    display: inline-block;
+    background-color: white;
 }
 
 #latex-source {
