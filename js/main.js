@@ -67,7 +67,7 @@ function isCursorElevated(mathbox) {
     return mathbox.find('sub.hasCursor, sup.hasCursor').length > 0;
 }
 
-var prevCursorAtBeginning = {}; // TODO: Seriously? Get A Better name than this
+var prevCursorAtBeginning = {};
 
 function updatePrevCursorAtBeginning(mathbox) {
     setTimeout(function () {
@@ -81,7 +81,7 @@ function cursorAtBeginningNotChanged(mathbox) {
     return prev === curr;
 }
 
-var prevCursorAtEnd = {}; // TODO: Seriously? Get A Better name than this
+var prevCursorAtEnd = {};
 
 function updatePrevCursorAtEnd(mathbox) {
     setTimeout(function () {
@@ -136,37 +136,32 @@ function update(mathbox) {
     save();
 }
 
+function add(mathbox) {
+    mathbox.mathquill('editable');
+    focus(mathbox);
+    mathboxIdNumber++;
+    mathbox.attr('id', mathboxIdNumber);
+    update(mathbox);
+}
+
 // Keyboard Stuff
 
 function onEnter(mathbox) {
-    //TODO: This needs hella refactoring
     /** Adds a new mathbox directly below and focuses it
      * */
     if (isCursorAtEnd(mathbox)) {
         mathbox.after('<span class="mathquill-editable mathbox"></span>');
         var next = mathbox.next();
-        next.mathquill('editable');
-        focus(next);
-        mathboxIdNumber++;
-        next.attr('id', mathboxIdNumber);
-        update(next);
+        add(next);
     } else if (isCursorAtBeginning(mathbox)) {
         mathbox.before('<span class="mathquill-editable mathbox"></span>');
         var prev = mathbox.prev();
-        prev.mathquill('editable');
-        focus(prev);
-        mathboxIdNumber++;
-        prev.attr('id', mathboxIdNumber);
-        update(prev);
+        add(prev);
     } else {
         // TODO: split up text between the two boxes
         mathbox.after('<span class="mathquill-editable mathbox"></span>');
         var next = mathbox.next();
-        next.mathquill('editable');
-        focus(next);
-        mathboxIdNumber++;
-        next.attr('id', mathboxIdNumber);
-        update(next);
+        add(next);
     }
 
 }
@@ -469,7 +464,7 @@ $.when(fsLoaded, c2bLoaded).done(function () {
 
 // ROUTER
 route();
-$.when(saveData, fsReady).done(function(){
+$.when(saveData, fsReady).done(function () {
     route();
 });
 
