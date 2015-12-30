@@ -67,6 +67,10 @@ function isCursorElevated(mathbox) {
     return mathbox.find('sub.hasCursor, sup.hasCursor, .fraction .hasCursor').length > 0;
 }
 
+function isCursorCommandInput(mathbox) {
+    return mathbox.find('.latex-command-input.hasCursor, .text .cursor').length > 0;
+}
+
 var prevCursorAtBeginning = {};
 
 function updatePrevCursorAtBeginning(mathbox) {
@@ -109,6 +113,20 @@ function cursorElevationNotChanged(mathbox) {
     return prev === curr;
 }
 
+var prevCursorCI = {};
+
+function updatePrevCursorCI(mathbox) {
+    setTimeout(function () {
+        prevCursorCI[getID(mathbox)] = isCursorCommandInput(mathbox);
+    }, 10);
+}
+
+function cursorCIChanged(mathbox) {
+    var prev = prevCursorCI[getID(mathbox)];
+    var curr = isCursorCommandInput(mathbox);
+    return prev !== curr;
+}
+
 /* Text Change Stuff */
 
 var prevText = {};
@@ -133,8 +151,11 @@ function update(mathbox) {
     updatePrevCursorAtEnd(mathbox);
     updatePrevText(mathbox);
     updatePrevCursorElevation(mathbox);
+    updatePrevCursorCI(mathbox);
     save();
 }
+
+/* Misc Utils */
 
 function add(mathbox) {
     mathbox.mathquill('editable');
@@ -166,7 +187,7 @@ function getLatex(html) {
             if (classes.length === 0) {
                 latex += this.innerHTML;
             } else if (classes.contains('textarea')) {
-            } else if (classes.contains('text')){
+            } else if (classes.contains('text')) {
                 latex += ' \\text{' + contents + '} ';
             } else if (classes.contains('fraction')) {
                 var numerator = getLatex($(this).children('.numerator').children());
@@ -234,6 +255,9 @@ function getLatex(html) {
 function onEnter(mathbox) {
     /** Adds a new mathbox directly below and focuses it
      * */
+    // make the enter wouldn't go to some mathquill purpose
+    if (isCursorCommandInput(mathbox) || cursorCIChanged(mathbox))
+        return;
     if (isCursorAtEnd(mathbox)) {
         mathbox.after('<span class="mathquill-editable mathbox"></span>');
         var next = mathbox.next();
@@ -243,7 +267,7 @@ function onEnter(mathbox) {
         var prev = mathbox.prev();
         add(prev);
     } else {
-        // make sure cursor isn't elevated
+        // make sure cursor not elevated
         if (isCursorElevated(mathbox))
             return;
         // determine latex before and after cursor
