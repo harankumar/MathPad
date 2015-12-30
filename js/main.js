@@ -26,6 +26,7 @@ function keystroke(mathbox, keyCode) {
 
 function focus(mathbox) {
     mathbox.find('textarea').focus();
+    keystroke(mathbox, 32);
 }
 
 function unfocus(mathbox) {
@@ -167,13 +168,24 @@ function add(mathbox) {
     update(mathbox);
 }
 
+function prevLatex(mathbox) {
+    var cursor = $('.cursor');
+    var prevHtml = $(cursor.prevAll().not('.textarea').get().reverse());
+    return getLatex(prevHtml);
+}
+
+function nextLatex(mathbox) {
+    var cursor = $('.cursor');
+    var nextHtml = cursor.nextAll().not('.textarea');
+    return getLatex(nextHtml);
+}
+
 function getLatex(html) {
     var latex = "";
     html.each(function () {
         var t = this.outerHTML;
         if (t === undefined || t === null || t === '')
             return;
-
         var tag = this.tagName.toLowerCase();
         var contents = getLatex($(this).children());
         if (tag === 'sup') {
@@ -187,7 +199,10 @@ function getLatex(html) {
         } else if (tag === 'span') {
             var classes = this.classList;
             if (classes.length === 0) {
-                latex += this.innerHTML;
+                if (this.innerHTML === '    ')
+                    latex += '\\quad ';
+                else
+                    latex += this.innerHTML;
             } else if (classes.contains('textarea')) {
             } else if (classes.contains('text')) {
                 latex += ' \\text{' + contents + '} ';
@@ -273,25 +288,22 @@ function onEnter(mathbox) {
         if (isCursorElevated(mathbox))
             return;
         // determine latex before and after cursor
-        var cursor = $('.cursor');
-        var prevHtml = $(cursor.prevAll().not('.textarea').get().reverse());
-        var prevLatex = getLatex(prevHtml);
-        var nextHtml = cursor.nextAll().not('.textarea');
-        var nextLatex = getLatex(nextHtml);
+        var _prevLatex = prevLatex(mathbox);
+        var _nextLatex = nextLatex(mathbox);
         // add new box
-        mathbox.after('<span class="mathquill-editable mathbox"></span>');
+        mathbox.after(mathboxText);
         var next = mathbox.next();
         add(next);
         // write latex to current and previous box
-        mathbox.mathquill('latex', prevLatex);
-        next.mathquill('latex', nextLatex);
+        mathbox.mathquill('latex', _prevLatex);
+        next.mathquill('latex', _nextLatex);
         // focus current
         focus(mathbox);
     }
 
 }
 
-//TODO: not just moving cursor to the end or beginning of line
+//TODO: not just moving cursor to the end or beginning of line !!!important
 function onBackspace(mathbox) {
     /** If at the beginning of mathbox, there are more than one, and the backspace wasn't also a text deleting one:
      * Combine the mathbox with the previous one
@@ -361,7 +373,19 @@ function onArrowDown(mathbox) {
     }
 }
 
-// TODO: Indentation?, shortcut for plain text, multiple mathboxes
+function onTab(mathbox, e) {
+    e.preventDefault();
+    if (isCursorCommandInput(mathbox) || cursorCIChanged(mathbox))
+        return;
+    if (isCursorElevated(mathbox))
+        return;
+    var _prevLatex = prevLatex(mathbox);
+    var _nextLatex = nextLatex(mathbox);
+    mathbox.mathquill('latex', _prevLatex + '\\quad ' + _nextLatex);
+    focus(mathbox);
+}
+
+// TODO: shortcut for plain text, multiple mathboxes
 
 // Listeners
 
@@ -381,6 +405,8 @@ function onKeyDown(e) {
         onArrowUp(mathbox);
     } else if (e.key === "ArrowDown" || e.keyCode === 40) {
         onArrowDown(mathbox);
+    } else if (e.key === "Tab" || e.keyCode === 9) {
+        onTab(mathbox, e);
     }
     update(mathbox);
 }
@@ -571,7 +597,7 @@ function toggleHelpMenu() {
 
 // Settings Menu
 function initSettingsMenu() {
-    $('#font-size-select').change(function(){
+    $('#font-size-select').change(function () {
         setRootFontSize(this.value);
     });
 }
