@@ -77,15 +77,18 @@ main {
     margin-right: auto;
     margin-left: auto;
     width: 75%;
+    margin-bottom: 2px;
+    border: 1px solid grey;
 }
 
 .mathbox {
-    width: 100%;
+    width: 96%;
     height: 100%;
     font-size: 1.5rem;
-    padding: 15px;
-    margin-top: 2px;
-    border: 1px solid grey;
+    padding: 1% 2%;
+    border: none;
+    border-bottom: 1px dotted #EEE;
+    box-shadow: none !important;
 }
 
 .overlay-header {
