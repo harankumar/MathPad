@@ -46,7 +46,7 @@
     </main>
     <!--TODO: Some sort of compatibility Dialog -->
     <!--TODO: Add Settings -->
-    <!--TODO: File Export - to SVG via mathjax? -->
+    <!--TODO: File Export -->
 
 </div>
 
@@ -81,16 +81,16 @@
         </p>
         <textarea id="latex-source" readonly></textarea>
         <div>
-            <button id="copy-text" data-clipboard-target="#latex-source">Copy to Clipboard</button>
+            <button id="copy-text" class="copy-button" data-clipboard-target="#latex-source">Copy to Clipboard</button>
         </div>
         <h3>
             Download as Image(s)
         </h3>
         <p>
-            Below is your document, as an image. You can download it as a single image or an image for each line. Below
-            is a preview:
+            Below is your document, as an image. Below is a preview:
         </p>
         <div id="image-output"></div>
+        <button id="image-download">Download Image</button>
         <!--TODO: Canvas output - this gonna be the hard part -->
         <!--TODO: Save as google doc, word, etc.-->
     </div>
@@ -168,7 +168,6 @@
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="js/mathquill.min.js"></script>
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js"></script>-->
 <script src="js/main.js"></script>
 </body>
 </html>

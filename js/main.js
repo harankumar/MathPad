@@ -274,7 +274,7 @@ function onClick(e) {
  ******************************/
 
 function initClipboard() {
-    new Clipboard('button');
+    new Clipboard('.copy-button');
 }
 
 /******************************
@@ -300,7 +300,7 @@ function getDocument() {
 function loadData() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
-    if (lines.length > 0) {
+    if (lines !== undefined && lines !== null && lines.length > 0) {
         mathbox.mathquill('latex', lines[0]);
         for (var i = 1; i < lines.length; i++) {
             keystroke(mathbox, 13);
@@ -348,15 +348,31 @@ function initSaveMenu() {
 
     $('#latex-source').val(getDocument());
 
-    h2cLoaded.done(function(){
+    var canvasLoaded = $.Deferred();
+    h2cLoaded.done(function () {
         var selectable = $('.selectable');
         selectable.addClass('hidden');
         $('#image-output').html('');
         html2canvas($('#text-output'), {
-            onrendered: function(canvas) {
+            onrendered: function (canvas) {
+                canvas.setAttribute('id', 'image-output-canvas');
                 $('#image-output').html(canvas);
-                selectable.addClass('hidden')
+                selectable.addClass('hidden');
+                canvasLoaded.resolve();
             }
+        });
+    });
+
+    $.when(fsReady, canvasLoaded).done(function () {
+        var downloadBtn = $('#image-download');
+        var canvas = document.getElementById('image-output-canvas');
+        downloadBtn.off();
+        downloadBtn.click(function () {
+            canvas.toBlob(function (blob) {
+                console.info(blob);
+                saveAs(blob, "math_document.png");
+                // TODO: saved docs are too wide
+            });
         });
     });
 }
@@ -411,8 +427,25 @@ $.getScript("js/hotkeys.min.js", function () {
 
 // HTML TO CANVAS
 var h2cLoaded = $.Deferred();
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js", function(){
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js", function () {
     h2cLoaded.resolve();
+});
+
+// CANVAS TO IMAGE FILE
+var fsReady = $.Deferred();
+var fsLoaded = $.Deferred();
+var c2bLoaded = $.Deferred();
+
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js", function () {
+    fsLoaded.resolve();
+});
+
+$.getScript("https://cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.1.0/js/canvas-to-blob.min.js", function () {
+    c2bLoaded.resolve();
+});
+
+$.when(fsLoaded, c2bLoaded).done(function () {
+    fsReady.resolve();
 });
 
 // DOM
