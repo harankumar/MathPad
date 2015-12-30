@@ -310,6 +310,7 @@ function loadData() {
     }
     unfocus($('.mathbox'));
     focus(mathbox);
+    saveData.resolve();
 }
 
 function save() {
@@ -406,11 +407,29 @@ function toggleHelpMenu() {
         displayHelpMenu();
 }
 
+// Router
+
+function route() {
+    var hash = window.location.hash.substring(1);
+    switch (hash) {
+        case "save":
+            displaySaveMenu();
+            break;
+        case "settings":
+            // insert
+            break;
+        case "help":
+            displayHelpMenu();
+            break;
+    }
+}
+
 /************************************
  * BIG WRAPPER/LOADER FOR EVERYTHING
  ************************************/
 
 // SAVING
+var saveData = $.Deferred();
 $.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function () {
     loadData();
     setInterval(save, 5000);
@@ -446,6 +465,12 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.
 
 $.when(fsLoaded, c2bLoaded).done(function () {
     fsReady.resolve();
+});
+
+// ROUTER
+route();
+$.when(saveData, fsReady).done(function(){
+    route();
 });
 
 // DOM
