@@ -144,6 +144,47 @@ function add(mathbox) {
     update(mathbox);
 }
 
+function getLatex(html) {
+    var latex = "";
+    html.each(function () {
+        var t = this.outerHTML;
+        if (t === undefined || t === null || t === '')
+            return;
+
+        var tag = this.tagName.toLowerCase();
+        if (tag === 'sup') {
+            var contents = getLatex($(this).children());
+            latex += " ^{" + contents + "} ";
+        } else if (tag === 'sub') {
+            var contents = getLatex($(this).children());
+            latex += " _{" + contents + "} ";
+        } else if (tag === 'var') {
+            latex += this.innerHTML;
+        } else if (tag === 'big') {
+            latex += this.innerHTML;
+        } else if (tag === 'span') {
+            var classes = this.classList;
+            if (classes.length === 0) {
+                latex += this.innerHTML;
+            } else if (classes.contains('textarea')) {
+            } else if (classes.contains('fraction')) {
+                var numerator = getLatex($(this).find('.numerator').children());
+                var denominator = getLatex($(this).find('.denominator').children());
+                latex += ' \\frac{' + numerator + '}{' + denominator + '} ';
+            } else if (classes.contains('binary-operator')) {
+                latex += this.innerHTML;
+            } else if ($(this).find('.sqrt-stem').length > 0){
+                var contents = getLatex($(this).find('.sqrt-stem').children());
+                latex += ' \\sqrt{' + contents + '} ';
+            } else {
+                alert('holy crap wtf\n' + this.outerHTML);
+                // TODO: find and account for all the edge cases and other scenarios
+            }
+        }
+    });
+    return latex;
+}
+
 // Keyboard Stuff
 
 function onEnter(mathbox) {
@@ -158,10 +199,26 @@ function onEnter(mathbox) {
         var prev = mathbox.prev();
         add(prev);
     } else {
-        // TODO: split up text between the two boxes
+        // make sure cursor isn't elevated
+        if (isCursorElevated(mathbox))
+            return;
+        // determine latex before and after cursor
+        var cursor = $('.cursor');
+        var prevHtml = $(cursor.prevAll().not('.textarea').get().reverse());
+        var prevLatex = getLatex(prevHtml);
+        console.log(prevLatex);
+        var nextHtml = cursor.nextAll().not('.textarea');
+        var nextLatex = getLatex(nextHtml);
+        console.log(nextLatex);
+        // add new box
         mathbox.after('<span class="mathquill-editable mathbox"></span>');
         var next = mathbox.next();
         add(next);
+        // write latex to current and previous box
+        mathbox.mathquill('latex', prevLatex);
+        next.mathquill('latex', nextLatex);
+        // focus current
+        focus(mathbox);
     }
 
 }
