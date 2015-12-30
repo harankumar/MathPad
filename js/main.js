@@ -64,7 +64,7 @@ function moveCursorToEnd(mathbox) {
 
 function isCursorElevated(mathbox) {
     // Checks if cursor is in super or subscript
-    return mathbox.find('sub.hasCursor, sup.hasCursor').length > 0;
+    return mathbox.find('sub.hasCursor, sup.hasCursor, .fraction .hasCursor').length > 0;
 }
 
 var prevCursorAtBeginning = {};
