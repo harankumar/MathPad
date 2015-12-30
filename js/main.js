@@ -418,7 +418,7 @@ function getDocument() {
     return getLines().join('\n');
 }
 
-function loadData() {
+function loadDocument() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
     if (lines !== undefined && lines !== null && lines.length > 0) {
@@ -434,14 +434,36 @@ function loadData() {
     }
     unfocus($('.mathbox'));
     focus(mathbox);
+}
+
+function saveDocument() {
+    store.set('lines', getLines());
+}
+
+function loadSettings() {
+    setRootFontSize(store.get('rootFontSize'));
+}
+
+function saveSettings() {
+    store.set('rootFontSize', rootFontSize);
+}
+
+function loadData() {
+    loadDocument();
+    loadSettings();
     saveDataLoaded.resolve();
+}
+
+function _save() {
+    saveDocument();
+    saveSettings();
 }
 
 function save() {
     saveDataLoaded.done(function () {
-        store.set('lines', getLines());
+        _save();
         setTimeout(function () {
-            store.set('lines', getLines());
+            _save();
         }, 10);
     });
 }
@@ -450,8 +472,11 @@ function save() {
  * SETTINGS
  ******************************/
 // Theming
+var rootFontSize = 16;
+
 function setRootFontSize(value) {
-    $('html').css('font-size', value + 'px');
+    rootFontSize = value;
+    $('html').css('font-size', rootFontSize + 'px');
     save();
 }
 
@@ -575,7 +600,7 @@ function route() {
             displaySaveMenu();
             break;
         case "settings":
-            // insert
+            displaySettingsMenu();
             break;
         case "help":
             displayHelpMenu();
