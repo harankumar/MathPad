@@ -6,9 +6,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!--TODO: more meta stuff -->
     <title>The Math Pad</title>
     <link rel="stylesheet" href="css/main.css">
     <!--TODO: more sophisticated analytics -->
+    <script>
+        (function () {
+            var t, i, e, n = window, o = document, a = arguments, s = "script", r = ["config", "track", "identify", "visit", "push", "call", "trackForm", "trackClick"], c = function () {
+                var t, i = this;
+                for (i._e = [], t = 0; r.length > t; t++)(function (t) {
+                    i[t] = function () {
+                        return i._e.push([t].concat(Array.prototype.slice.call(arguments, 0))), i
+                    }
+                })(r[t])
+            };
+            for (n._w = n._w || {}, t = 0; a.length > t; t++)n._w[a[t]] = n[a[t]] = n[a[t]] || new c;
+            i = o.createElement(s), i.async = 1, i.src = "//static.woopra.com/js/w.js", e = o.getElementsByTagName(s)[0], e.parentNode.insertBefore(i, e)
+        })("woopra");
+        woopra.config({domain: 'harankumar.github.io'});
+        woopra.track();
+    </script>
 </head>
 <body>
 
@@ -191,7 +208,6 @@
     <a href="https://github.com/harankumar/MathPad">Contribute</a>
 </footer>
 
-<script src="js/lib/woopra.js" async></script>
 <script src="js/lib/jquery.js"></script>
 <script src="js/lib/mathquill.js"></script>
 <script src="js/lib/store.js"></script>
@@ -200,6 +216,11 @@
 <script src="js/lib/html2canvas.js"></script>
 <script src="js/lib/filesaver.js"></script>
 <script src="js/lib/canvas2blob.js"></script>
-<script src="js/main.js"></script>
+<script src="js/app/mathbox.js"></script>
+<script src="js/app/clipboard.js"></script>
+<script src="js/app/save.js"></script>
+<script src="js/app/settings.js"></script>
+<script src="js/app/menus.js"></script>
+<script src="js/app/main.js"></script>
 </body>
 </html>
