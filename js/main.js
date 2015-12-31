@@ -25,12 +25,16 @@ function keystroke(mathbox, keyCode) {
 // Focus
 
 function focus(mathbox) {
+    unfocus($('.mathbox'));
     mathbox.find('textarea').focus();
     keystroke(mathbox, 32);
 }
 
 function unfocus(mathbox) {
     mathbox.find('textarea').blur();
+    mathbox.find('.cursor').remove();
+    mathbox.removeClass('.hasCursor');
+    mathbox.find('.hasCursor').removeClass('.hasCursor');
 }
 
 // ID
@@ -156,6 +160,7 @@ function update(mathbox) {
     updatePrevCursorElevation(mathbox);
     updatePrevCursorCI(mathbox);
     save();
+    bindCombos();
 }
 
 /* Misc Utils */
@@ -166,6 +171,7 @@ function add(mathbox) {
     mathboxIdNumber++;
     mathbox.attr('id', mathboxIdNumber);
     update(mathbox);
+    moveCursorToBeginning(mathbox);
 }
 
 function prevLatex(mathbox) {
@@ -259,7 +265,6 @@ function getLatex(html) {
             } else if (classes.contains('non-leaf')) {
                 latex += getLatex($(this).children());
             } else {
-                console.error('holy crap wtf\n' + this.outerHTML);
                 latex += getLatex($(this.innerHTML));
             }
         }
@@ -286,6 +291,8 @@ function onEnter(mathbox) {
     } else {
         // make sure cursor not elevated
         if (isCursorElevated(mathbox))
+            return;
+        if (mathbox.children('.cursor').length == 0)
             return;
         // determine latex before and after cursor
         var _prevLatex = prevLatex(mathbox);
@@ -316,6 +323,7 @@ function onBackspace(mathbox) {
         prev.mathquill('latex', prev.mathquill('latex') + ' ' + mathbox.mathquill('latex'));
         mathbox.remove();
         focus(prev);
+        moveCursorToEnd(prev);
     }
 }
 
@@ -329,6 +337,7 @@ function onDelete(mathbox) {
         next.mathquill('latex', mathbox.mathquill('latex') + ' ' + next.mathquill('latex'));
         mathbox.remove();
         focus(next);
+        moveCursorToEnd(next);
     }
 }
 
@@ -416,6 +425,30 @@ function onKeyDown(e) {
 function onClick(e) {
     var mathbox = $(e.target).parent().parent();
     update(mathbox);
+}
+
+// Combinations
+
+function onCombo(func){
+    function a(event){
+        event.preventDefault();
+        func();
+    }
+    return a;
+}
+
+function bindCombos() {
+    $(document).unbind();
+    $(document).bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
+    $(document).bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
+    $(document).bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
+
+    var textarea = $('.mathbox textarea');
+    textarea.unbind();
+    textarea.bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
+    textarea.bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
+    textarea.bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
+    textarea.bind('keydown', 'shift+esc', onCombo(plaintext));
 }
 
 /******************************
@@ -651,11 +684,7 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js
 $.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard.min.js", initClipboard);
 
 // KEY COMBINATIONS
-$.getScript("js/hotkeys.min.js", function () {
-    $(document).bind('keydown', 'alt+ctrl+s', toggleSaveMenu);
-    $(document).bind('keydown', 'alt+ctrl+j', toggleSettingsMenu);
-    $(document).bind('keydown', 'alt+ctrl+h', toggleHelpMenu);
-});
+$.getScript("js/hotkeys.min.js", bindCombos);
 
 // HTML TO CANVAS
 var h2cLoaded = $.Deferred();
