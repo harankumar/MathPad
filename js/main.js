@@ -514,7 +514,6 @@ function saveSettings() {
 function loadData() {
     loadDocument();
     loadSettings();
-    saveDataLoaded.resolve();
 }
 
 function _save() {
@@ -523,12 +522,10 @@ function _save() {
 }
 
 function save() {
-    saveDataLoaded.done(function () {
+    _save();
+    setTimeout(function () {
         _save();
-        setTimeout(function () {
-            _save();
-        }, 10);
-    });
+    }, 10);
 }
 
 /******************************
@@ -577,21 +574,19 @@ function initSaveMenu() {
     $('#latex-source').val(getDocument());
 
     var canvasLoaded = $.Deferred();
-    h2cLoaded.done(function () {
-        var selectable = $('.selectable');
-        selectable.addClass('hidden');
-        $('#image-output').html('');
-        html2canvas($('#text-output'), {
-            onrendered: function (canvas) {
-                canvas.setAttribute('id', 'image-output-canvas');
-                $('#image-output').html(canvas);
-                selectable.addClass('hidden');
-                canvasLoaded.resolve();
-            }
-        });
+    var selectable = $('.selectable');
+    selectable.addClass('hidden');
+    $('#image-output').html('');
+    html2canvas($('#text-output'), {
+        onrendered: function (canvas) {
+            canvas.setAttribute('id', 'image-output-canvas');
+            $('#image-output').html(canvas);
+            selectable.addClass('hidden');
+            canvasLoaded.resolve();
+        }
     });
 
-    $.when(fsReady, canvasLoaded).done(function () {
+    $.when(canvasLoaded).done(function () {
         var downloadBtn = $('#image-download');
         var canvas = document.getElementById('image-output-canvas');
         downloadBtn.off();
@@ -676,49 +671,17 @@ function route() {
  ************************************/
 
 // SAVING
-var saveDataLoaded = $.Deferred();
-//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function () {
 loadData();
 setInterval(save, 5000);
-//});
 
 // CLIPBOARD
-//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard.min.js",
 initClipboard();
-//);
 
 // KEY COMBINATIONS
-//$.getScript("js/hotkeys.min.js",
 bindCombos();
-
-// HTML TO CANVAS
-var h2cLoaded = $.Deferred();
-//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js", function () {
-    h2cLoaded.resolve();
-//});
-
-// CANVAS TO IMAGE FILE
-var fsReady = $.Deferred();
-var fsLoaded = $.Deferred();
-var c2bLoaded = $.Deferred();
-
-//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js", function () {
-fsLoaded.resolve();
-//});
-
-//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.1.0/js/canvas-to-blob.min.js", function () {
-c2bLoaded.resolve();
-//});
-
-$.when(fsLoaded, c2bLoaded).done(function () {
-    fsReady.resolve();
-});
 
 // ROUTER
 route();
-$.when(saveDataLoaded, fsReady).done(function () {
-    route();
-});
 
 // DOM
 $(document).ready(function () {
