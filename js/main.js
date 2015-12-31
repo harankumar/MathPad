@@ -298,7 +298,9 @@ function onEnter(mathbox) {
         mathbox.mathquill('latex', _prevLatex);
         next.mathquill('latex', _nextLatex);
         // focus current
-        focus(mathbox);
+        unfocus($('.mathbox'));
+        focus(next);
+        moveCursorToBeginning(next);
     }
 
 }
