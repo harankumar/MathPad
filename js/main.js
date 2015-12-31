@@ -484,6 +484,7 @@ function loadDocument() {
     var lines = store.get('lines');
     var mathbox = $('.mathbox:last');
     if (lines !== undefined && lines !== null && lines.length > 0) {
+        add(mathbox);
         mathbox.mathquill('latex', lines[0]);
         if (lines.length > 1) {
             for (var i = 1; i < lines.length; i++) {
