@@ -429,11 +429,12 @@ function onClick(e) {
 
 // Combinations
 
-function onCombo(func){
-    function a(event){
+function onCombo(func) {
+    function a(event) {
         event.preventDefault();
         func();
     }
+
     return a;
 }
 
@@ -448,7 +449,7 @@ function bindCombos() {
     textarea.bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
     textarea.bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
     textarea.bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
-    textarea.bind('keydown', 'shift+esc', onCombo(plaintext));
+    //textarea.bind('keydown', 'shift+esc', onCombo(plaintext));
 }
 
 /******************************
@@ -675,35 +676,38 @@ function route() {
 
 // SAVING
 var saveDataLoaded = $.Deferred();
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function () {
-    loadData();
-    setInterval(save, 5000);
-});
+//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.min.js", function () {
+loadData();
+setInterval(save, 5000);
+//});
 
 // CLIPBOARD
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard.min.js", initClipboard);
+//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.5/clipboard.min.js",
+initClipboard();
+//);
 
 // KEY COMBINATIONS
-$.getScript("js/hotkeys.min.js", bindCombos);
+//$.getScript("js/hotkeys.min.js",
+bindCombos();
 
 // HTML TO CANVAS
 var h2cLoaded = $.Deferred();
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js", function () {
+//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js", function () {
     h2cLoaded.resolve();
-});
+//});
 
 // CANVAS TO IMAGE FILE
 var fsReady = $.Deferred();
 var fsLoaded = $.Deferred();
 var c2bLoaded = $.Deferred();
 
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js", function () {
-    fsLoaded.resolve();
-});
+//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js", function () {
+fsLoaded.resolve();
+//});
 
-$.getScript("https://cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.1.0/js/canvas-to-blob.min.js", function () {
-    c2bLoaded.resolve();
-});
+//$.getScript("https://cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.1.0/js/canvas-to-blob.min.js", function () {
+c2bLoaded.resolve();
+//});
 
 $.when(fsLoaded, c2bLoaded).done(function () {
     fsReady.resolve();
