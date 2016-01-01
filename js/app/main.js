@@ -3,17 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // SAVING
-loadData();
-setInterval(save, 5000);
+app.document.load();
+app.usersettings.load();
 
 // CLIPBOARD
-initClipboard();
-
-// KEY COMBINATIONS
-bindCombos();
+app.clipboard.initialize();
 
 // ROUTER
-route();
+app.screens.route();
+app.screens.initListeners();
 
 // DOM
 $(document).ready(function () {
@@ -21,11 +19,4 @@ $(document).ready(function () {
     var notecard = $('.notecard');
     notecard.keydown(onKeyDown);
     notecard.click(onClick);
-    // MENUS
-    $('#save-button').click(displaySaveMenu);
-    $('#save-close').click(showMathPad);
-    $('#help-button').click(displayHelpMenu);
-    $('#help-close').click(showMathPad);
-    $('#settings-button').click(displaySettingsMenu);
-    $('#settings-close').click(showMathPad);
 });

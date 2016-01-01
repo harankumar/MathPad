@@ -155,7 +155,7 @@ function update(mathbox) {
     updatePrevText(mathbox);
     updatePrevCursorElevation(mathbox);
     updatePrevCursorCI(mathbox);
-    save();
+    app.document.save();
     bindCombos();
 }
 
@@ -435,16 +435,16 @@ function onCombo(func) {
 }
 
 function bindCombos() {
-    $(document).unbind();
-    $(document).bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
-    $(document).bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
-    $(document).bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
-
-    var textarea = $('.mathbox textarea');
-    textarea.unbind();
-    textarea.bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
-    textarea.bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
-    textarea.bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
+    //$(document).unbind();
+    //$(document).bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
+    //$(document).bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
+    //$(document).bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
+    //
+    //var textarea = $('.mathbox textarea');
+    //textarea.unbind();
+    //textarea.bind('keydown', 'alt+ctrl+s', onCombo(app.screens.save.show));
+    //textarea.bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
+    //textarea.bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
     //textarea.bind('keydown', 'shift+esc', onCombo(plaintext));
 }
 
