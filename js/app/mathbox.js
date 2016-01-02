@@ -2,11 +2,38 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var mathboxText = '<span class="mathquill-editable mathbox"></span>';
+var app = app || {};
+
+app.MathBox = MathBox;
+
+function MathBox(element, id, type) {
+    // Initialize Properties
+    this.el = $(element);
+    this.id = id;
+    this.type = type;
+
+    this.prevText = "";
+
+    // Initialize Element
+    element.mathquill('editable');
+    this.focus();
+    element.attr('id', this.id);
+
+    // Initialize Cursor
+    this.cursor = new app.Cursor(this);
+    this.cursor.moveToBeginning();
+
+    // Initialize Keyboard
+    this.keyListener = new app.KeyListener(this);
+
+    this.update();
+}
+
+app.mathboxText = '<span class="mathquill-editable mathbox"></span>';
 
 // Mathbox Manipulation
 
-function keystroke(mathbox, keyCode) {
+MathBox.prototype.keystroke = function (keyCode) {
     var customKeyDownEvent = $.Event('keydown');
 
     customKeyDownEvent.bubbles = false;
@@ -15,181 +42,61 @@ function keystroke(mathbox, keyCode) {
     customKeyDownEvent.keyCode = keyCode;
     customKeyDownEvent.which = keyCode;
 
-    mathbox.children().children('textarea').trigger(customKeyDownEvent);
-}
+    this.el.children().children('textarea').trigger(customKeyDownEvent);
+};
 
 // Focus
 
-function focus(mathbox) {
-    unfocus($('.mathbox'));
-    mathbox.find('textarea').focus();
-    keystroke(mathbox, 32);
-}
-
-function unfocus(mathbox) {
-    mathbox.find('textarea').blur();
-    mathbox.find('.cursor').remove();
-    mathbox.removeClass('.hasCursor');
-    mathbox.find('.hasCursor').removeClass('.hasCursor');
-}
-
-// ID
-
-var mathboxIdNumber = 1;
-
-function getID(mathbox) {
-    return mathbox.attr('id');
-}
-
-// Mathbox Status/Update Stuff
-
-function isEmpty(mathbox) {
-    return mathbox.mathquill('latex') === '';
-}
-
-/* Cursor Stuff */
-
-function isCursorAtBeginning(mathbox) {
-    return mathbox.children(":nth-child(2)").hasClass("cursor");
-}
-
-function moveCursorToBeginning(mathbox) {
-    keystroke(mathbox, 36);
-}
-
-function isCursorAtEnd(mathbox) {
-    return mathbox.children(":last-child").hasClass("cursor");
-}
-
-function moveCursorToEnd(mathbox) {
-    keystroke(mathbox, 35);
-}
-
-function isCursorElevated(mathbox) {
-    // Checks if cursor is in super or subscript
-    return mathbox.find('sub.hasCursor, sup.hasCursor, .fraction .hasCursor').length > 0;
-}
-
-function isCursorCommandInput(mathbox) {
-    return mathbox.find('.latex-command-input.hasCursor, .text .cursor').length > 0;
-}
-
-var prevCursorAtBeginning = {};
-
-function updatePrevCursorAtBeginning(mathbox) {
+MathBox.prototype.focus = function () {
+    // TODO: fix random stuttering
+    app.document.unfocusAll();
+    setTimeout(app.document.unfocusAll, 10);
     setTimeout(function () {
-        prevCursorAtBeginning[getID(mathbox)] = isCursorAtBeginning(mathbox);
-    }, 10);
-}
+        this.el.find('textarea').focus();
+        this.keystroke(32);
+    }.bind(this), 10);
+};
 
-function cursorAtBeginningNotChanged(mathbox) {
-    var prev = prevCursorAtBeginning[getID(mathbox)];
-    var curr = isCursorAtBeginning(mathbox);
-    return prev === curr;
-}
+MathBox.prototype.unfocus = function () {
+    this.el.find('textarea').blur();
+    this.cursor.deactivate();
+};
 
-var prevCursorAtEnd = {};
+// Misc Utils/Status Stuff
 
-function updatePrevCursorAtEnd(mathbox) {
-    setTimeout(function () {
-        prevCursorAtEnd[getID(mathbox)] = isCursorAtEnd(mathbox);
-    }, 10);
-}
+MathBox.prototype.getPrev = function () {
+    var index = app.document.getIndex(this.id);
+    // find next index
+    var prev = index - 1;
+    // return the object there
+    return app.document.mathboxes[prev];
+};
 
-function cursorAtEndNotChanged(mathbox) {
-    var prev = prevCursorAtEnd[getID(mathbox)];
-    var curr = isCursorAtEnd(mathbox);
-    return prev === curr;
-}
+MathBox.prototype.getNext = function () {
+    var index = app.document.getIndex(this.id);
+    // find next index
+    var next = index + 1;
+    // return the object there
+    return app.document.mathboxes[next];
+};
 
-var prevCursorElevation = {};
+MathBox.prototype.getIndex = function () {
+    return app.document.getIndex(this.id);
+};
 
-function updatePrevCursorElevation(mathbox) {
-    setTimeout(function () {
-        prevCursorElevation[getID(mathbox)] = isCursorElevated(mathbox);
-    }, 10);
-}
+MathBox.prototype.getText = function () {
+    return this.el.mathquill('latex');
+};
 
-function cursorElevationNotChanged(mathbox) {
-    var prev = prevCursorElevation[getID(mathbox)];
-    var curr = isCursorElevated(mathbox);
-    return prev === curr;
-}
-
-var prevCursorCI = {};
-
-function updatePrevCursorCI(mathbox) {
-    setTimeout(function () {
-        prevCursorCI[getID(mathbox)] = isCursorCommandInput(mathbox);
-    }, 10);
-}
-
-function cursorCIChanged(mathbox) {
-    var prev = prevCursorCI[getID(mathbox)];
-    var curr = isCursorCommandInput(mathbox);
-    return prev !== curr;
-}
-
-/* Text Change Stuff */
-
-var prevText = {};
-
-function textNotChanged(mathbox) {
-    var prev = prevText[getID(mathbox)];
-    var curr = mathbox.mathquill('latex');
-    return prev === curr;
-}
-
-function updatePrevText(mathbox) {
-    setTimeout(function () {
-        var text = mathbox.mathquill('latex');
-        if (text === undefined || text === null)
-            text = '';
-        prevText[getID(mathbox)] = text;
-    }, 10);
-}
-
-function update(mathbox) {
-    updatePrevCursorAtBeginning(mathbox);
-    updatePrevCursorAtEnd(mathbox);
-    updatePrevText(mathbox);
-    updatePrevCursorElevation(mathbox);
-    updatePrevCursorCI(mathbox);
-    app.document.save();
-    bindCombos();
-}
-
-/* Misc Utils */
-
-function add(mathbox) {
-    mathbox.mathquill('editable');
-    focus(mathbox);
-    mathboxIdNumber++;
-    mathbox.attr('id', mathboxIdNumber);
-    update(mathbox);
-    moveCursorToBeginning(mathbox);
-}
-
-function prevLatex(mathbox) {
-    var cursor = $('.cursor');
-    var prevHtml = $(cursor.prevAll().not('.textarea').get().reverse());
-    return getLatex(prevHtml);
-}
-
-function nextLatex(mathbox) {
-    var cursor = $('.cursor');
-    var nextHtml = cursor.nextAll().not('.textarea');
-    return getLatex(nextHtml);
-}
-
-function getLatex(html) {
+function latex2HTML(html) {
     var latex = "";
+    // TODO: fix issue where &nbsp; insert after f's
     html.each(function () {
         var t = this.outerHTML;
         if (t === undefined || t === null || t === '')
             return;
         var tag = this.tagName.toLowerCase();
-        var contents = getLatex($(this).children());
+        var contents = latex2HTML($(this).children());
         if (tag === 'sup') {
             latex += " ^{" + contents + "} ";
         } else if (tag === 'sub') {
@@ -209,13 +116,13 @@ function getLatex(html) {
             } else if (classes.contains('text')) {
                 latex += ' \\text{' + contents + '} ';
             } else if (classes.contains('fraction')) {
-                var numerator = getLatex($(this).children('.numerator').children());
-                var denominator = getLatex($(this).children('.denominator').children());
+                var numerator = latex2HTML($(this).children('.numerator').children());
+                var denominator = latex2HTML($(this).children('.denominator').children());
                 latex += ' \\frac{' + numerator + '}{' + denominator + '} ';
             } else if (classes.contains('binary-operator')) {
                 latex += this.innerHTML;
             } else if ($(this).children('.sqrt-stem').length > 0) {
-                contents = getLatex($(this).children('.sqrt-stem').children());
+                contents = latex2HTML($(this).children('.sqrt-stem').children());
                 latex += ' \\sqrt{' + contents + '} ';
             } else if (classes.contains('non-italicized-function')) {
                 latex += ' \\' + this.innerHTML + ' ';
@@ -224,8 +131,8 @@ function getLatex(html) {
                 var arr = next.children('.array');
                 if (arr.length > 0) {
                     // left paren for a binom
-                    var top = getLatex(arr.children(':first').children());
-                    var bottom = getLatex(arr.children(':last').children());
+                    var top = latex2HTML(arr.children(':first').children());
+                    var bottom = latex2HTML(arr.children(':last').children());
                     latex += ' \\binom{' + top + '}{' + bottom + '} ';
                 } else if ($(this).prev().children('.array').length > 0) {
                     // right paren for a binom, skip it
@@ -256,195 +163,53 @@ function getLatex(html) {
             } else if (classes.contains('overline')) {
                 latex += ' \\overline{' + contents + '} ';
             } else if ($(this).children('.vector-stem').length > 0) {
-                contents = getLatex($(this).children('.vector-stem').children());
+                contents = latex2HTML($(this).children('.vector-stem').children());
                 latex += ' \\vec{' + contents + '} ';
             } else if (classes.contains('non-leaf')) {
-                latex += getLatex($(this).children());
+                latex += latex2HTML($(this).children());
             } else {
-                latex += getLatex($(this.innerHTML));
+                latex += latex2HTML($(this.innerHTML));
             }
         }
     });
     return latex;
 }
 
-// Keyboard Stuff
+MathBox.prototype.getTextBeforeCursor = function () {
+    var cursor = this.el.find('.cursor');
+    var html = $(cursor.prevAll().not('.textarea').get().reverse());
+    return latex2HTML(html);
+};
 
-function onEnter(mathbox) {
-    /** Adds a new mathbox directly below and focuses it
-     * */
-    // make the enter wouldn't go to some mathquill purpose
-    if (isCursorCommandInput(mathbox) || cursorCIChanged(mathbox))
-        return;
-    if (isCursorAtEnd(mathbox)) {
-        mathbox.after(mathboxText);
-        var next = mathbox.next();
-        add(next);
-    } else if (isCursorAtBeginning(mathbox)) {
-        mathbox.before(mathboxText);
-        var prev = mathbox.prev();
-        add(prev);
-    } else {
-        // make sure cursor not elevated
-        if (isCursorElevated(mathbox))
-            return;
-        if (mathbox.children('.cursor').length == 0)
-            return;
-        // determine latex before and after cursor
-        var _prevLatex = prevLatex(mathbox);
-        var _nextLatex = nextLatex(mathbox);
-        // add new box
-        mathbox.after(mathboxText);
-        var next = mathbox.next();
-        add(next);
-        // write latex to current and previous box
-        mathbox.mathquill('latex', _prevLatex);
-        next.mathquill('latex', _nextLatex);
-        // focus current
-        unfocus($('.mathbox'));
-        focus(next);
-        moveCursorToBeginning(next);
-    }
+MathBox.prototype.getTextAfterCursor = function () {
+    var cursor = this.el.find('.cursor');
+    var html = cursor.nextAll().not('.textarea');
+    return latex2HTML(html);
+};
 
-}
+MathBox.prototype.isEmpty = function () {
+    return this.getText() === '';
+};
 
-//TODO: not just moving cursor to the end or beginning of line !!!important
-function onBackspace(mathbox) {
-    /** If at the beginning of mathbox, there are more than one, and the backspace wasn't also a text deleting one:
-     * Combine the mathbox with the previous one
-     * */
-    var prev = mathbox.prev();
-    var next = mathbox.next();
-    if (isCursorAtBeginning(mathbox) && textNotChanged(mathbox) && $(".mathbox").length > 1) {
-        prev.mathquill('latex', prev.mathquill('latex') + ' ' + mathbox.mathquill('latex'));
-        mathbox.remove();
-        focus(prev);
-        moveCursorToEnd(prev);
-    }
-}
+MathBox.prototype.textNotChanged = function () {
+    return this.prevText === this.getText();
+};
 
-function onDelete(mathbox) {
-    /** If at the end of mathbox, there are more than one, and the delete wasn't also a text deleting one:
-     * Combine the mathbox with the next one
-     * */
-    var prev = mathbox.prev();
-    var next = mathbox.next();
-    if (isCursorAtEnd(mathbox) && textNotChanged(mathbox) && $(".mathbox").length > 1) {
-        next.mathquill('latex', mathbox.mathquill('latex') + ' ' + next.mathquill('latex'));
-        mathbox.remove();
-        focus(next);
-        moveCursorToEnd(next);
-    }
-}
+MathBox.prototype.updatePrevText = function () {
+    var el = this.el;
+    var mb = this;
+    setTimeout(function () {
+        var text = el.mathquill('latex');
+        if (text === undefined || text === null)
+            text = '';
+        mb.prevText = text;
+    }, 10);
+};
 
-function onArrowLeft(mathbox) {
-    /** If at the beginning of mathbox, there is a box above, and the keystroke didn't cause cursor movement:
-     * Move to mathbox directly above
-     * */
-    var prev = mathbox.prev();
-    if (isCursorAtBeginning(mathbox) && cursorAtBeginningNotChanged(mathbox) && prev.length !== 0) {
-        focus(prev);
-        moveCursorToEnd(prev);
-    }
-    update(mathbox);
-}
+MathBox.prototype.update = function () {
+    this.cursor.update();
 
-function onArrowRight(mathbox) {
-    /** If at the end of mathbox, there is a box below, and the keystroke didn't cause cursor movement:
-     * Move to mathbox directly below
-     * */
-    var next = mathbox.next();
-    if (isCursorAtEnd(mathbox) && cursorAtEndNotChanged(mathbox) && next.length !== 0) {
-        focus(next);
-        moveCursorToBeginning(next);
-    }
-}
-
-function onArrowUp(mathbox) {
-    /** If there is a box above, and the keystroke didn't cause an elevation change:
-     *  move to it */
-    var prev = mathbox.prev();
-    if (prev.length !== 0 && cursorElevationNotChanged(mathbox)) {
-        focus(prev);
-        moveCursorToEnd(prev);
-    }
-}
-
-function onArrowDown(mathbox) {
-    /** If there is a box below, and the keystroke didn't cause an elevation change:
-     * move to it */
-    var next = mathbox.next();
-    if (next.length !== 0 && cursorElevationNotChanged(mathbox)) {
-        focus(next);
-        moveCursorToBeginning(next);
-    }
-}
-
-function onTab(mathbox, e) {
-    e.preventDefault();
-    if (isCursorCommandInput(mathbox) || cursorCIChanged(mathbox))
-        return;
-    if (isCursorElevated(mathbox))
-        return;
-    var _prevLatex = prevLatex(mathbox);
-    var _nextLatex = nextLatex(mathbox);
-    mathbox.mathquill('latex', _prevLatex + '\\quad ' + _nextLatex);
-    focus(mathbox);
-}
-
-// TODO: shortcut for plain text, multiple mathboxes
-
-// Listeners
-
-function onKeyDown(e) {
-    var mathbox = $(e.target).parent().parent();
-    if (e.key === "Enter" || e.keyCode === 13) {
-        onEnter(mathbox);
-    } else if (e.key === "Backspace" || e.keyCode === 8) {
-        onBackspace(mathbox);
-    } else if (e.key === "Delete" || e.keyCode === 46) {
-        onDelete(mathbox);
-    } else if (e.key === "ArrowLeft" || e.keyCode === 37) {
-        onArrowLeft(mathbox);
-    } else if (e.key === "ArrowRight" || e.keyCode === 39) {
-        onArrowRight(mathbox);
-    } else if (e.key === "ArrowUp" || e.keyCode === 38) {
-        onArrowUp(mathbox);
-    } else if (e.key === "ArrowDown" || e.keyCode === 40) {
-        onArrowDown(mathbox);
-    } else if (e.key === "Tab" || e.keyCode === 9) {
-        onTab(mathbox, e);
-    }
-    update(mathbox);
-}
-
-function onClick(e) {
-    var mathbox = $(e.target).parent().parent();
-    update(mathbox);
-}
-
-// Combinations
-
-function onCombo(func) {
-    function a(event) {
-        event.preventDefault();
-        func();
-    }
-
-    return a;
-}
-
-function bindCombos() {
-    //$(document).unbind();
-    //$(document).bind('keydown', 'alt+ctrl+s', onCombo(toggleSaveMenu));
-    //$(document).bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
-    //$(document).bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
-    //
-    //var textarea = $('.mathbox textarea');
-    //textarea.unbind();
-    //textarea.bind('keydown', 'alt+ctrl+s', onCombo(app.screens.save.show));
-    //textarea.bind('keydown', 'alt+ctrl+j', onCombo(toggleSettingsMenu));
-    //textarea.bind('keydown', 'alt+ctrl+h', onCombo(toggleHelpMenu));
-    //textarea.bind('keydown', 'shift+esc', onCombo(plaintext));
-}
-
+    this.updatePrevText();
+    app.document.save();
+    //bindCombos();
+};
