@@ -48,8 +48,8 @@ var app = (function (app) {
 
     MathBox.prototype.focus = function () {
         // TODO: fix random stuttering
-        app.document.unfocusAll();
-        setTimeout(app.document.unfocusAll, 10);
+        app.document.unfocusAll.bind(app.document)();
+        setTimeout(app.document.unfocusAll.bind(app.document), 10);
         setTimeout(function () {
             this.el.find('textarea').focus();
             this.keystroke(32);
@@ -209,8 +209,7 @@ var app = (function (app) {
         this.cursor.update();
 
         this.updatePrevText();
-        app.document.save();
-        //bindCombos();
+        app.document.save.bind(app.document)();
     };
 
     return app;

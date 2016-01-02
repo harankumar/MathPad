@@ -48,7 +48,7 @@ var app = (function (app) {
             this.mbel.mathquill('latex', _prevLatex);
             next.mathquill('latex', _nextLatex);
             // focus current
-            app.document.unfocusAll();
+            app.document.unfocusAll.bind(app.document)();
             focus(next);
             this.mb.getNext().cursor.moveToBeginning();
         }
@@ -179,13 +179,13 @@ var app = (function (app) {
         } else if (e.key === "Tab" || e.keyCode === 9) {
             this._tab(e)
         }
-        //this.mb.update();
     };
 
     KeyListener.prototype.initializeListeners = function () {
         var textarea = this.mbel.find('textarea');
         textarea.keydown(this._onKeyDown.bind(this));
         textarea.keydown(this.cursor.update.bind(this.cursor));
+        textarea.keydown(app.document.save.bind(app.document));
         textarea.bind('keydown', 'alt+ctrl+s', app.screens.save.show);
         textarea.bind('keydown', 'alt+ctrl+j', app.screens.settings.show);
         textarea.bind('keydown', 'alt+ctrl+h', app.screens.help.show);

@@ -41,16 +41,14 @@ var app = (function (app) {
             app.document.mathboxes.splice(index, index);
         },
         unfocusAll: function () {
-            var mb = app.document.mathboxes;
-            for (var i = 0; i < mb.length; i++) {
-                mb[i].unfocus();
+            for (var i = 0; i < this.mathboxes.length; i++) {
+                this.mathboxes[i].unfocus();
             }
         },
         asArray: function () {
             var lines = [];
-            var mb = app.document.mathboxes;
-            for (var i = 0; i < mb.length; i++) {
-                lines.push(mb[i].getText());
+            for (var i = 0; i < this.mathboxes.length; i++) {
+                lines.push(this.mathboxes[i].getText());
             }
             return lines;
         },
@@ -60,19 +58,19 @@ var app = (function (app) {
         load: function () {
             var lines = store.get('lines');
             var mathbox = $('.mathbox:last');
-            app.document.add(mathbox);
+            this.add(mathbox);
             if (lines !== undefined && lines !== null && lines.length > 0) {
                 mathbox.mathquill('latex', lines[0]);
                 if (lines.length > 1) {
                     for (var i = 1; i < lines.length; i++) {
                         mathbox.after(app.mathboxText);
                         mathbox = mathbox.next();
-                        app.document.add(mathbox);
+                        this.add(mathbox);
                         mathbox.mathquill('latex', lines[i]);
                     }
                 }
             }
-            app.document.unfocusAll();
+            this.unfocusAll();
             focus(mathbox);
         },
         store: function () {
@@ -80,10 +78,7 @@ var app = (function (app) {
         },
         save: function () {
             this.store();
-            setTimeout(function () {
-                // JS Context is obnoxious :(
-                app.document.store()
-            }, 10);
+            setTimeout(this.store.bind(this), 10);
         }
     };
     return app;

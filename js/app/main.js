@@ -7,7 +7,7 @@ app.screens.route();
 app.screens.initListeners();
 
 // DOCUMENT
-app.document.load();
+app.document.load.bind(app.document)();
 
 // SETTINGS
 app.usersettings.load();

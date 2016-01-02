@@ -7,7 +7,7 @@ var app = (function (app) {
         save: {
             displayed: false,
             load: function () {
-                var lines = app.document.asArray();
+                var lines = app.document.asArray.bind(app.document)();
 
                 var textOutput = $('#text-output');
                 textOutput.html('');
