@@ -56,11 +56,12 @@ var app = (function (app) {
     };
 
     //TODO: not just moving cursor to the end or beginning of line !!!important
-    KeyListener.prototype._backspace = function () {
+    KeyListener.prototype._backspace = function (event) {
         /** If at the beginning of mathbox, there are more than one, and the backspace wasn't also a text deleting one:
          * Combine the mathbox with the previous one
          * */
         if (this.mb.cursor.isAtBeginning() && this.mb.textNotChanged() && $(".mathbox").length > 1) {
+            event.preventDefault();
             var prev = this.mb.getPrev();
             prev.el.mathquill('latex', prev.el.mathquill('latex') + ' ' + this.mbel.mathquill('latex'));
             prev.focus();
@@ -165,7 +166,7 @@ var app = (function (app) {
         if (e.key === "Enter" || e.keyCode === 13) {
             this._enter();
         } else if (e.key === "Backspace" || e.keyCode === 8) {
-            this._backspace();
+            this._backspace(e);
         } else if (e.key === "Delete" || e.keyCode === 46) {
             this._delete();
         } else if (e.key === "ArrowLeft" || e.keyCode === 37) {
