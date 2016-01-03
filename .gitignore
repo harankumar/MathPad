@@ -72,3 +72,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### Ant Stuff ###
+intermediate/
+publish/
