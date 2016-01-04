@@ -63,6 +63,12 @@ var app = (function (app) {
 
 // Misc Utils/Status Stuff
 
+    MathBox.prototype.getNeighbor = function () {
+        var prev = this.getPrev();
+        var next = this.getNext();
+        return prev || next;
+    };
+
     MathBox.prototype.getPrev = function () {
         var index = app.document.getIndex(this.id);
         // find next index
@@ -85,6 +91,11 @@ var app = (function (app) {
 
     MathBox.prototype.getText = function () {
         return this.el.mathquill('latex');
+    };
+
+    MathBox.prototype.delete = function () {
+        if ($('.mathbox').length > 1)
+            app.document.remove(this);
     };
 
     function latex2HTML(html) {

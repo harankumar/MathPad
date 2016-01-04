@@ -15,7 +15,8 @@ var app = (function (app) {
                     index = i;
             }
             if (index === -1) {
-                console.error('could not find index of mathbox!');
+                //console.error('could not find index of mathbox!');
+                return;
             }
             return index
         },

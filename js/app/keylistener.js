@@ -60,6 +60,10 @@ var app = (function (app) {
         /** If at the beginning of mathbox, there are more than one, and the backspace wasn't also a text deleting one:
          * Combine the mathbox with the previous one
          * */
+        if (event.shiftKey && event.ctrlKey) {
+            this.mb.delete.bind(this.mb)();
+            this.mb.getNeighbor.bind(this.mb)().focus();
+        }
         if (this.mb.cursor.isAtBeginning() && this.mb.textNotChanged() && $(".mathbox").length > 1) {
             event.preventDefault();
             var prev = this.mb.getPrev();
@@ -190,8 +194,7 @@ var app = (function (app) {
         textarea.bind('keydown', 'alt+ctrl+s', app.screens.save.show);
         textarea.bind('keydown', 'alt+ctrl+j', app.screens.settings.show);
         textarea.bind('keydown', 'alt+ctrl+h', app.screens.help.show);
-
-
+        //TODO: textarea.bind('keydown', 'esc+shift', this.mb.plaintextify.bind(this.mb));
     };
 
     return app;
