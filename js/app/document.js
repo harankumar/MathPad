@@ -26,7 +26,7 @@ var app = (function (app) {
         add: function (el) {
             var id = ++app.document.mathboxID;
             app.document.mathboxes.push(
-                new app.MathBox(el, id, 'temp')
+                new app.MathBox(el, id, 'math')
             );
         },
         addAtIndex: function (el, index) {

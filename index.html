@@ -47,6 +47,10 @@
                 </a>
 
                 <a id="help-button" href="#help" class="button" title="Help">
+                    <i class="fa fa-lg fa-question-circle"></i>
+                </a>
+
+                <a id="info-button" href="#info" class="button" title="Info">
                     <i class="fa fa-lg fa-info-circle"></i>
                 </a>
             </span>
@@ -132,6 +136,7 @@
             <option value="18">18px</option>
             <option value="24">24px</option>
         </select>
+        <!--TODO: set default one on load-->
     </div>
 </div>
 
@@ -193,13 +198,37 @@
                 <td class="codebox"><span class="code">Control + Alt + H</span></td>
                 <td>Toggle this dialog</td>
             </tr>
+            <tr>
+                <td class="codebox"><span class="code">Control + Alt + I</span></td>
+                <td>Toggle info dialog</td>
+            </tr>
         </table>
         <h3>Save and Export</h3>
         Don't worry about remembering to save, because every time you make a change it is automatically saved.
         Coming soon, you will be able export documents as images (SVG) or as LaTeX, or save them as a Google Doc.
-        <h3>Questions or Comments?</h3>
-        If you encounter any issues or want to send feedback, please contact me via <a
-            href="https://github.com/harankumar/MathPad">Github</a> or email me at hkumar8200 [at] gmail {DOT} com.
+    </div>
+</div>
+
+<div id="info" class="hidden">
+    <div class="overlay-header clearfix">
+        <a href="#" class="overlay-close button" id="info-close">
+            <i class="fa fa-lg fa-angle-left"></i>
+            <span>Back</span>
+        </a>
+        <span class="overlay-title">About</span>
+    </div>
+    <div class="overlay-body">
+        <h3>License</h3>
+        This application is open source software - free as in free speech. It is licensed under the <a
+            href="http://mozilla.org/MPL/2.0/">Mozilla Public License</a>. You can access the full text of the license
+        on the Mozilla website.
+        <h3>Developer</h3>
+        This app was developed by Haran Kumar. If you encounter any issues or want to send feedback, please contact me
+        via <a href="https://github.com/harankumar/MathPad"> the Github repo </a> or email me at hkumar8200 [at] gmail
+        {DOT} com.
+        <h3>Credits</h3>
+        Special shoutout to the creators of the software libraries that make this website possible. You can view the
+        full list on the github repository.
     </div>
 </div>
 

@@ -194,6 +194,7 @@ var app = (function (app) {
         textarea.bind('keydown', 'alt+ctrl+s', app.screens.save.show);
         textarea.bind('keydown', 'alt+ctrl+j', app.screens.settings.show);
         textarea.bind('keydown', 'alt+ctrl+h', app.screens.help.show);
+        textarea.bind('keydown', 'alt+ctrl+i', app.screens.info.toggle);
         //TODO: textarea.bind('keydown', 'esc+shift', this.mb.plaintextify.bind(this.mb));
     };
 

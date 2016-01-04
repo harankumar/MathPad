@@ -97,6 +97,21 @@ var app = (function (app) {
             }
 
         },
+        info: {
+            displayed: false,
+            show: function (){
+                app.screens.hideAll();
+                $('#info').removeClass('hidden');
+                app.screens.info.displayed = true;
+                window.location.hash = "info";
+            },
+            toggle: function (){
+                if (app.screens.info.displayed)
+                    app.screens.document.show();
+                else
+                    app.screens.info.show();
+            }
+        },
         document: {
             show: function () {
                 app.screens.hideAll();
@@ -122,13 +137,18 @@ var app = (function (app) {
                 case "help":
                     app.screens.settings.show();
                     break;
+                case "information":
+                case "about":
+                case "info":
+                    app.screens.info.show();
+                    break;
                 case "document":
                 case "":
                     app.screens.document.show();
                     break;
                 default:
                     app.screens.document.show();
-                    console.log("Unrecognized hash " + hash);
+                    console.error("Unrecognized hash " + hash);
             }
         },
         initListeners: function () {
@@ -146,6 +166,10 @@ var app = (function (app) {
                 $('#settings-button').click(app.screens.settings.show);
                 $('#settings-close').click(app.screens.document.show);
                 doc.bind('keydown', 'alt+ctrl+h', app.screens.help.toggle);
+
+                $('#info-button').click(app.screens.info.show);
+                $('#info-close').click(app.screens.document.show);
+                doc.bind('keydown', 'alt+ctrl+i', app.screens.info.toggle);
             });
         }
     };
